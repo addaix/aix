@@ -47,11 +47,11 @@ dependencies = [
 ]
 
 [project.urls]
-Documentation = "https://thorwhalen.github.io/aix/"
-Homepage = "https://github.com/thorwhalen/aix"
-Repository = "https://github.com/thorwhalen/aix"
-Issues = "https://github.com/thorwhalen/aix/issues"
-Changelog = "https://github.com/thorwhalen/aix/blob/master/CHANGELOG.md"
+Documentation = "https://addaix.github.io/aix/"
+Homepage = "https://github.com/addaix/aix"
+Repository = "https://github.com/addaix/aix"
+Issues = "https://github.com/addaix/aix/issues"
+Changelog = "https://github.com/addaix/aix/blob/master/CHANGELOG.md"
 
 [project.optional-dependencies]
 # Provider SDKs used by the legacy aix.gen_ai backends
