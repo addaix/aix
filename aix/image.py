@@ -96,7 +96,7 @@ class GeneratedImage:
         model: str = None,
         prompt: str = None,
         revised_prompt: str = None,
-    ):
+    ) -> None:
         """Initialize generated image.
 
         Args:
@@ -159,7 +159,7 @@ class GeneratedImage:
         self._pil_image = PILImage.open(BytesIO(image_bytes))
         return self._pil_image
 
-    def save(self, path: Union[str, Path], format: str = None):
+    def save(self, path: Union[str, Path], format: str = None) -> None:
         """Save image to file.
 
         Args:
@@ -179,7 +179,7 @@ class GeneratedImage:
             with open(path, "wb") as f:
                 f.write(self.as_bytes())
 
-    def show(self):
+    def show(self) -> None:
         """Display the image.
 
         Requires PIL (Pillow) to be installed.

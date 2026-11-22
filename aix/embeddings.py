@@ -194,7 +194,7 @@ class EmbeddingCache:
         True
     """
 
-    def __init__(self, model: str = None, **embedding_kwargs):
+    def __init__(self, model: str = None, **embedding_kwargs) -> None:
         """Initialize cache.
 
         Args:
@@ -266,7 +266,7 @@ class EmbeddingCache:
 
         return results
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear the cache."""
         self._cache.clear()
 

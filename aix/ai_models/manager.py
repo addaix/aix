@@ -32,7 +32,7 @@ class ModelManager:
     1
     """
 
-    def __init__(self, *, storage_path: Path | None = None):
+    def __init__(self, *, storage_path: Path | None = None) -> None:
         """Initialize model manager with optional persistent storage.
 
         Args:

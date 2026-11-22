@@ -17,7 +17,7 @@ class OpenRouterSource(ModelSource):
     OpenRouter maintains a comprehensive registry of models across providers.
     """
 
-    def __init__(self, *, timeout: int = 30):
+    def __init__(self, *, timeout: int = 30) -> None:
         self._timeout = timeout
         self._endpoint = "https://openrouter.ai/api/v1/models"
 
@@ -85,7 +85,9 @@ class OllamaSource(ModelSource):
     Queries the Ollama API for models available on the local machine.
     """
 
-    def __init__(self, *, base_url: str = "http://localhost:11434", timeout: int = 10):
+    def __init__(
+        self, *, base_url: str = "http://localhost:11434", timeout: int = 10
+    ) -> None:
         self._base_url = base_url
         self._timeout = timeout
 
@@ -140,7 +142,7 @@ class ProviderAPISource(ModelSource):
         api_key: str = None,
         base_url: str = "https://api.openai.com/v1",
         timeout: int = 30,
-    ):
+    ) -> None:
         from aix.credentials import resolve_api_key
 
         self._provider_name = provider_name

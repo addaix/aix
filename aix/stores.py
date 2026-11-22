@@ -15,7 +15,7 @@ def get_extension(string):
     return m.group(1).lower() if m else None
 
 
-def add_extension_based_decoder(ext, decoder):
+def add_extension_based_decoder(ext, decoder) -> None:
     """
     Register a decoder function for a given file extension.
 

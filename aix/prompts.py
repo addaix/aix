@@ -574,7 +574,7 @@ class PromptFuncs:
         'Hola'
     """
 
-    def __init__(self, model: str = None, **default_kwargs):
+    def __init__(self, model: str = None, **default_kwargs) -> None:
         """Initialize collection.
 
         Args:
@@ -638,7 +638,7 @@ class CommonFuncs(PromptFuncs):
         ['AI', 'artificial', 'intelligence']
     """
 
-    def __init__(self, model: str = None):
+    def __init__(self, model: str = None) -> None:
         super().__init__(model=model)
 
         # Text transformation functions
@@ -690,7 +690,9 @@ class ConstraintViolation(ValueError):
         True
     """
 
-    def __init__(self, message: str, *, answer: Any = None, valid_answers: Any = None):
+    def __init__(
+        self, message: str, *, answer: Any = None, valid_answers: Any = None
+    ) -> None:
         super().__init__(message)
         self.answer = answer
         self.valid_answers = valid_answers

@@ -50,7 +50,7 @@ class GeneratedVideo:
         resolution: str = None,
         status: str = "completed",
         task_id: str = None,
-    ):
+    ) -> None:
         """Initialize generated video.
 
         Args:
@@ -95,7 +95,7 @@ class GeneratedVideo:
 
         raise ValueError("No video data available")
 
-    def save(self, path: Union[str, Path]):
+    def save(self, path: Union[str, Path]) -> None:
         """Save video to file.
 
         Args:
@@ -110,7 +110,7 @@ class GeneratedVideo:
         with open(path, "wb") as f:
             f.write(video_bytes)
 
-    def wait_until_complete(self, max_wait: int = 300, poll_interval: int = 5):
+    def wait_until_complete(self, max_wait: int = 300, poll_interval: int = 5) -> None:
         """Wait for video generation to complete (for async operations).
 
         Args:

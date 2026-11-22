@@ -102,7 +102,7 @@ class BatchError(str):
         """
         return (self.exception,), {"index": self.index, "message": str(self)}
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"{type(self).__name__}({str(self)!r}, index={self.index!r})"
 
 
@@ -524,7 +524,7 @@ class BatchProcessor:
         batch_size: int = None,
         max_workers: int = None,
         show_progress: bool = True,
-    ):
+    ) -> None:
         """Initialize batch processor.
 
         Args:
@@ -585,7 +585,7 @@ class BatchProcessor:
         self.results = results
         return results
 
-    def save_results(self, filepath: str):
+    def save_results(self, filepath: str) -> None:
         """Save results to file.
 
         Args:
@@ -598,7 +598,7 @@ class BatchProcessor:
         with open(path, "w") as f:
             json.dump(self.results, f, indent=2)
 
-    def clear(self):
+    def clear(self) -> None:
         """Clear stored results and errors."""
         self.results = []
         self.errors = []

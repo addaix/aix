@@ -864,7 +864,9 @@ class ChatSession:
         'Your name is Alice.'
     """
 
-    def __init__(self, system_prompt: str = None, *, model: str = None, **chat_kwargs):
+    def __init__(
+        self, system_prompt: str = None, *, model: str = None, **chat_kwargs
+    ) -> None:
         """Initialize a new chat session.
 
         Args:
@@ -903,7 +905,7 @@ class ChatSession:
 
         return response
 
-    def clear_history(self, keep_system: bool = True):
+    def clear_history(self, keep_system: bool = True) -> None:
         """Clear conversation history.
 
         Args:
