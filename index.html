@@ -686,6 +686,10 @@ store lives in your user app-config folder — never in the repo.</p>
 <span class="n">result</span> <span class="o">=</span> <span class="n">my_funcs</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s2">"def foo(): return bar"</span><span class="p">)</span>
 </pre></div>
 </div>
+<section id="prompt-func-and-prompt-optimisation-frameworks">
+<h4><code class="docutils literal notranslate"><span class="pre">prompt_func</span></code> and prompt-optimisation frameworks<a class="headerlink" href="#prompt-func-and-prompt-optimisation-frameworks" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">prompt_func</span></code> is for prompts whose template is <em>data</em>: a string constant, or a template loaded from a store at run time. Parameters and <code class="docutils literal notranslate"><span class="pre">{name:default}</span></code> defaults come from the template, <code class="docutils literal notranslate"><span class="pre">egress=</span></code> turns the reply into a typed value, and model and credentials come from aix’s configuration. If you would rather declare inputs and outputs and let a framework write and optimise the prompt against a metric, use <a class="reference external" href="https://github.com/stanfordnlp/dspy">DSPy</a> instead; it does a different job. If your prompts are hand-written Python functions that return a string, <a class="reference external" href="https://github.com/Mirascope/mirascope">Mirascope</a> fits that style.</p>
+</section>
 <section id="enforced-validated-structured-output">
 <h4>Enforced, validated structured output<a class="headerlink" href="#enforced-validated-structured-output" title="Link to this heading">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">output_schema</span></code> above is flat and only requested in the prompt; nothing checks the reply against it. For anything nested (objects inside objects, arrays of objects, enums, required vs optional), pass <code class="docutils literal notranslate"><span class="pre">response_schema=</span></code>, either a Pydantic model or a JSON Schema dict. It works on <code class="docutils literal notranslate"><span class="pre">complete()</span></code>, <code class="docutils literal notranslate"><span class="pre">sample()</span></code> and <code class="docutils literal notranslate"><span class="pre">prompt_func()</span></code>:</p>
@@ -1134,7 +1138,7 @@ resolving — pass those provider-prefixed (<code class="docutils literal notran
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 22:08 UTC from <a href="https://github.com/addaix/aix/commit/c477fd01a66399ea0f57801e6b418f05ff12c94c">c477fd0</a> (master) · aix 0.0.57 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 23:13 UTC from <a href="https://github.com/addaix/aix/commit/9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459">9c28a45</a> (master) · aix 0.0.57 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>
@@ -1195,6 +1199,7 @@ resolving — pass those provider-prefixed (<code class="docutils literal notran
 </li>
 <li><a class="reference internal" href="#embeddings">2. Embeddings</a></li>
 <li><a class="reference internal" href="#prompt-based-functions">3. Prompt-Based Functions</a><ul>
+<li><a class="reference internal" href="#prompt-func-and-prompt-optimisation-frameworks"><code class="docutils literal notranslate"><span class="pre">prompt_func</span></code> and prompt-optimisation frameworks</a></li>
 <li><a class="reference internal" href="#enforced-validated-structured-output">Enforced, validated structured output</a></li>
 </ul>
 </li>
