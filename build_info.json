@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-22T20:24:28Z",
+  "built_at": "2026-11-22T22:08:58Z",
   "package": {
     "name": "aix",
     "version": "0.0.57",
@@ -9,24 +9,24 @@
   },
   "git": {
     "available": true,
-    "commit": "97e3ab100fd1dfb357fe7df7989bfdb708601e2b",
-    "short_commit": "97e3ab1",
+    "commit": "c477fd01a66399ea0f57801e6b418f05ff12c94c",
+    "short_commit": "c477fd0",
     "branch": "master",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/addaix/aix",
-    "commit_url": "https://github.com/addaix/aix/commit/97e3ab100fd1dfb357fe7df7989bfdb708601e2b",
+    "commit_url": "https://github.com/addaix/aix/commit/c477fd01a66399ea0f57801e6b418f05ff12c94c",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "addaix/aix",
-    "sha": "97e3ab100fd1dfb357fe7df7989bfdb708601e2b",
+    "sha": "c477fd01a66399ea0f57801e6b418f05ff12c94c",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "45066031026",
-    "run_url": "https://github.com/addaix/aix/actions/runs/45066031026",
+    "run_id": "45075859794",
+    "run_url": "https://github.com/addaix/aix/actions/runs/45075859794",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -64,7 +64,7 @@
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout 97e3ab100fd1dfb357fe7df7989bfdb708601e2b\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout c477fd01a66399ea0f57801e6b418f05ff12c94c\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

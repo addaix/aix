@@ -300,6 +300,7 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"aix[
 </section>
 <section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
+<!-- wads-docs: skip needs a provider API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">chat</span><span class="p">,</span> <span class="n">embeddings</span><span class="p">,</span> <span class="n">prompt_func</span><span class="p">,</span> <span class="n">models</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_image</span><span class="p">,</span> <span class="n">text_to_speech</span><span class="p">,</span> <span class="n">transcribe</span>
 
@@ -349,6 +350,7 @@ source of truth: <code class="docutils literal notranslate"><span class="pre">ai
 <li><p><strong>User config file</strong> — a TOML file (see below).</p></li>
 <li><p><strong>Shipped defaults</strong> — the built-in values.</p></li>
 </ol>
+<!-- wads-docs: skip needs a provider API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">aix</span>
 
 <span class="c1"># Inspect the active configuration</span>
@@ -369,6 +371,7 @@ source of truth: <code class="docutils literal notranslate"><span class="pre">ai
 <h3>Semantic aliases<a class="headerlink" href="#semantic-aliases" title="Link to this heading">¶</a></h3>
 <p>Pass an intent-level name instead of a concrete model id. Shipped aliases:
 <code class="docutils literal notranslate"><span class="pre">fast</span></code> (cheap/low-latency), <code class="docutils literal notranslate"><span class="pre">best</span></code> (highest quality), <code class="docutils literal notranslate"><span class="pre">cheap</span></code> (cheapest).</p>
+<!-- wads-docs: skip needs a provider API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">aix</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="s2">"hard question"</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"best"</span><span class="p">)</span>  <span class="c1"># -&gt; resolves via the alias table</span>
 <span class="n">aix</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="s2">"quick question"</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"fast"</span><span class="p">)</span>
 
@@ -519,6 +522,7 @@ store lives in your user app-config folder — never in the repo.</p>
 <section id="chat-interface">
 <span id="1-chat-interface"></span><h3>1. Chat Interface<a class="headerlink" href="#chat-interface" title="Link to this heading">¶</a></h3>
 <p>Clean, provider-agnostic chat completions:</p>
+<!-- wads-docs: skip needs an Anthropic API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">chat</span>
 
 <span class="c1"># Simple text prompt</span>
@@ -548,6 +552,7 @@ store lives in your user app-config folder — never in the repo.</p>
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">chat()</span></code> returns only the first choice’s text. When you need the rest of the response (every one of <code class="docutils literal notranslate"><span class="pre">n</span></code> choices, token usage, why each choice stopped, the model that actually served the call), use <code class="docutils literal notranslate"><span class="pre">complete()</span></code>, which takes the same arguments and returns a <code class="docutils literal notranslate"><span class="pre">Completion</span></code>:</p>
+<!-- wads-docs: skip needs an Anthropic API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">complete</span><span class="p">,</span> <span class="n">Usage</span>
 
 <span class="n">c</span> <span class="o">=</span> <span class="n">complete</span><span class="p">(</span><span class="s2">"Name a color"</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
@@ -564,6 +569,7 @@ store lives in your user app-config folder — never in the repo.</p>
 </pre></div>
 </div>
 <p>To ask the same question several times (agreement, stability, majority vote), use <code class="docutils literal notranslate"><span class="pre">sample()</span></code>. It sends one request with provider-side <code class="docutils literal notranslate"><span class="pre">n</span></code> when LiteLLM reports that the model supports it, and otherwise makes <code class="docutils literal notranslate"><span class="pre">n</span></code> independent requests concurrently. It records which path it took, because the two are not the same statistical object:</p>
+<!-- wads-docs: skip needs an Anthropic API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">sample</span>
 
@@ -585,6 +591,7 @@ store lives in your user app-config folder — never in the repo.</p>
 <section id="seeds-determinism-and-asking-before-calling">
 <h4>Seeds, determinism, and asking before calling<a class="headerlink" href="#seeds-determinism-and-asking-before-calling" title="Link to this heading">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">complete()</span></code> and <code class="docutils literal notranslate"><span class="pre">sample()</span></code> take a keyword-only <code class="docutils literal notranslate"><span class="pre">seed</span></code>. Its support is provider-dependent, and even where it is supported, determinism is best-effort. So before you read run-to-run variance as a property of the model, check two things:</p>
+<!-- wads-docs: skip needs an Anthropic API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">supports</span><span class="p">,</span> <span class="n">complete</span>
 
 <span class="n">supports</span><span class="p">(</span><span class="s2">"gpt-4o-mini"</span><span class="p">,</span> <span class="s2">"seed"</span><span class="p">)</span>  <span class="c1"># True  -- LiteLLM forwards seed (best-effort)</span>
@@ -607,6 +614,7 @@ store lives in your user app-config folder — never in the repo.</p>
 <section id="embeddings">
 <span id="2-embeddings"></span><h3>2. Embeddings<a class="headerlink" href="#embeddings" title="Link to this heading">¶</a></h3>
 <p>Generate vector embeddings for semantic search and similarity:</p>
+<!-- wads-docs: skip needs a provider API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">embeddings</span><span class="p">,</span> <span class="n">embed</span><span class="p">,</span> <span class="n">cosine_similarity</span><span class="p">,</span> <span class="n">find_most_similar</span>
 
 <span class="c1"># Batch embeddings</span>
@@ -681,6 +689,7 @@ store lives in your user app-config folder — never in the repo.</p>
 <section id="enforced-validated-structured-output">
 <h4>Enforced, validated structured output<a class="headerlink" href="#enforced-validated-structured-output" title="Link to this heading">¶</a></h4>
 <p><code class="docutils literal notranslate"><span class="pre">output_schema</span></code> above is flat and only requested in the prompt; nothing checks the reply against it. For anything nested (objects inside objects, arrays of objects, enums, required vs optional), pass <code class="docutils literal notranslate"><span class="pre">response_schema=</span></code>, either a Pydantic model or a JSON Schema dict. It works on <code class="docutils literal notranslate"><span class="pre">complete()</span></code>, <code class="docutils literal notranslate"><span class="pre">sample()</span></code> and <code class="docutils literal notranslate"><span class="pre">prompt_func()</span></code>:</p>
+<!-- wads-docs: skip needs an Anthropic API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">complete</span><span class="p">,</span> <span class="n">prompt_func</span>
@@ -722,6 +731,7 @@ store lives in your user app-config folder — never in the repo.</p>
 <section id="model-discovery-selection">
 <span id="4-model-discovery--selection"></span><h3>4. Model Discovery &amp; Selection<a class="headerlink" href="#model-discovery-selection" title="Link to this heading">¶</a></h3>
 <p>Discover and filter models across providers:</p>
+<!-- wads-docs: skip needs network discovery (models.discover) and an API key to chat -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">models</span>
 
 <span class="c1"># Discover available models</span>
@@ -760,6 +770,7 @@ store lives in your user app-config folder — never in the repo.</p>
 <section id="batch-operations">
 <span id="5-batch-operations"></span><h3>5. Batch Operations<a class="headerlink" href="#batch-operations" title="Link to this heading">¶</a></h3>
 <p>Process multiple requests efficiently:</p>
+<!-- wads-docs: skip needs a provider API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">batch_chat</span><span class="p">,</span> <span class="n">batch_embeddings</span><span class="p">,</span> <span class="n">BatchProcessor</span>
 
 <span class="c1"># Batch chat</span>
@@ -791,6 +802,7 @@ store lives in your user app-config folder — never in the repo.</p>
 <section id="image-generation">
 <span id="6-image-generation"></span><h3>6. Image Generation<a class="headerlink" href="#image-generation" title="Link to this heading">¶</a></h3>
 <p>Generate images from text descriptions:</p>
+<!-- wads-docs: skip needs a provider API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_image</span><span class="p">,</span> <span class="n">generate_images</span>
 
 <span class="c1"># Simple image generation</span>
@@ -822,6 +834,7 @@ store lives in your user app-config folder — never in the repo.</p>
 <section id="audio-operations">
 <span id="7-audio-operations"></span><h3>7. Audio Operations<a class="headerlink" href="#audio-operations" title="Link to this heading">¶</a></h3>
 <p>Text-to-speech and speech-to-text:</p>
+<!-- wads-docs: skip needs a provider API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">text_to_speech</span><span class="p">,</span> <span class="n">transcribe</span><span class="p">,</span> <span class="n">transcribe_with_timestamps</span>
 
 <span class="c1"># Text to speech</span>
@@ -853,6 +866,7 @@ store lives in your user app-config folder — never in the repo.</p>
 <section id="video-generation-coming-soon">
 <span id="8-video-generation-coming-soon"></span><h3>8. Video Generation (Coming Soon)<a class="headerlink" href="#video-generation-coming-soon" title="Link to this heading">¶</a></h3>
 <p>Video generation with provider-specific implementations:</p>
+<!-- wads-docs: skip video providers are not configured by default (raises NotImplementedError) -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">generate_video</span><span class="p">,</span> <span class="n">get_video_providers</span>
 
 <span class="c1"># Check available providers</span>
@@ -894,6 +908,7 @@ store lives in your user app-config folder — never in the repo.</p>
 </div>
 </li>
 <li><p>Use OpenRouter models:</p>
+<!-- wads-docs: skip needs an OpenRouter API key; indented list fence -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prefix models with 'openrouter/'</span>
 <span class="n">chat</span><span class="p">(</span><span class="s2">"Hello"</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"openrouter/openai/gpt-4o"</span><span class="p">)</span>
 <span class="n">chat</span><span class="p">(</span><span class="s2">"Hello"</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">"openrouter/anthropic/claude-3.5-sonnet"</span><span class="p">)</span>
@@ -983,16 +998,19 @@ resolving — pass those provider-prefixed (<code class="docutils literal notran
 <h2>Advanced Usage<a class="headerlink" href="#advanced-usage" title="Link to this heading">¶</a></h2>
 <section id="custom-model-sources">
 <h3>Custom Model Sources<a class="headerlink" href="#custom-model-sources" title="Link to this heading">¶</a></h3>
+<!-- wads-docs: skip needs network access (OpenRouter discovery) -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix.ai_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelManager</span><span class="p">,</span> <span class="n">OpenRouterSource</span>
 
 <span class="n">manager</span> <span class="o">=</span> <span class="n">ModelManager</span><span class="p">()</span>
 <span class="n">source</span> <span class="o">=</span> <span class="n">OpenRouterSource</span><span class="p">()</span>
+<span class="n">manager</span><span class="o">.</span><span class="n">register_source</span><span class="p">(</span><span class="s2">"openrouter"</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>
 <span class="n">models</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">discover_from_source</span><span class="p">(</span><span class="s2">"openrouter"</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="connector-specific-metadata">
 <h3>Connector-Specific Metadata<a class="headerlink" href="#connector-specific-metadata" title="Link to this heading">¶</a></h3>
+<!-- wads-docs: skip fragment; models comes from the discovery example above -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Get provider-specific parameters</span>
 <span class="n">metadata</span> <span class="o">=</span> <span class="n">models</span><span class="o">.</span><span class="n">get_connector_metadata</span><span class="p">(</span><span class="s2">"openai/gpt-4o"</span><span class="p">,</span> <span class="s2">"openai"</span><span class="p">)</span>
 <span class="c1"># Use with native SDK: openai.ChatCompletion.create(**metadata, messages=[...])</span>
@@ -1031,6 +1049,7 @@ resolving — pass those provider-prefixed (<code class="docutils literal notran
 <h2>Examples<a class="headerlink" href="#examples" title="Link to this heading">¶</a></h2>
 <section id="semantic-search">
 <h3>Semantic Search<a class="headerlink" href="#semantic-search" title="Link to this heading">¶</a></h3>
+<!-- wads-docs: skip needs a provider API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed</span><span class="p">,</span> <span class="n">cosine_similarity</span>
 
 <span class="c1"># Build document index</span>
@@ -1067,6 +1086,7 @@ resolving — pass those provider-prefixed (<code class="docutils literal notran
 </section>
 <section id="multi-model-comparison">
 <h3>Multi-Model Comparison<a class="headerlink" href="#multi-model-comparison" title="Link to this heading">¶</a></h3>
+<!-- wads-docs: skip needs a provider API key -->
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">aix</span><span class="w"> </span><span class="kn">import</span> <span class="n">chat</span>
 
 <span class="n">prompt</span> <span class="o">=</span> <span class="s2">"Explain quantum computing in one sentence"</span>
@@ -1114,7 +1134,7 @@ resolving — pass those provider-prefixed (<code class="docutils literal notran
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 20:24 UTC from <a href="https://github.com/addaix/aix/commit/97e3ab100fd1dfb357fe7df7989bfdb708601e2b">97e3ab1</a> (master) · aix 0.0.57 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-22 22:08 UTC from <a href="https://github.com/addaix/aix/commit/c477fd01a66399ea0f57801e6b418f05ff12c94c">c477fd0</a> (master) · aix 0.0.57 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>

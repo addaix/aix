@@ -1,4 +1,4 @@
-> built 2026-11-22 20:24 UTC from 97e3ab1 (master) · aix 0.0.57. Details: build_info.json
+> built 2026-11-22 22:08 UTC from c477fd0 (master) · aix 0.0.57. Details: build_info.json
 
 # index.html.md
 
@@ -33,6 +33,7 @@ pip install "aix[all]"        # all optional backends
 
 ## Quick Start
 
+<!-- wads-docs: skip needs a provider API key -->
 ```python
 from aix import chat, embeddings, prompt_func, models
 from aix import generate_image, text_to_speech, transcribe
@@ -83,6 +84,7 @@ Defaults are resolved in layers, **highest precedence first**:
 4. **User config file** — a TOML file (see below).
 5. **Shipped defaults** — the built-in values.
 
+<!-- wads-docs: skip needs a provider API key -->
 ```python
 import aix
 
@@ -105,6 +107,7 @@ with aix.using(chat_model="openai/gpt-4o-mini"):
 Pass an intent-level name instead of a concrete model id. Shipped aliases:
 `fast` (cheap/low-latency), `best` (highest quality), `cheap` (cheapest).
 
+<!-- wads-docs: skip needs a provider API key -->
 ```python
 aix.chat("hard question", model="best")  # -> resolves via the alias table
 aix.chat("quick question", model="fast")
@@ -219,6 +222,7 @@ store lives in your user app-config folder — never in the repo.
 
 Clean, provider-agnostic chat completions:
 
+<!-- wads-docs: skip needs an Anthropic API key -->
 ```python
 from aix import chat
 
@@ -250,6 +254,7 @@ response = session.send("And if I add 3 to that?")  # Remembers context
 
 `chat()` returns only the first choice’s text. When you need the rest of the response (every one of `n` choices, token usage, why each choice stopped, the model that actually served the call), use `complete()`, which takes the same arguments and returns a `Completion`:
 
+<!-- wads-docs: skip needs an Anthropic API key -->
 ```python
 from aix import complete, Usage
 
@@ -268,6 +273,7 @@ total = sum((c.usage for c in cs if c.usage), Usage())
 
 To ask the same question several times (agreement, stability, majority vote), use `sample()`. It sends one request with provider-side `n` when LiteLLM reports that the model supports it, and otherwise makes `n` independent requests concurrently. It records which path it took, because the two are not the same statistical object:
 
+<!-- wads-docs: skip needs an Anthropic API key -->
 ```python
 import json
 from aix import sample
@@ -293,6 +299,7 @@ A failed request does not discard the work already paid for. By default `sample(
 
 `complete()` and `sample()` take a keyword-only `seed`. Its support is provider-dependent, and even where it is supported, determinism is best-effort. So before you read run-to-run variance as a property of the model, check two things:
 
+<!-- wads-docs: skip needs an Anthropic API key -->
 ```python
 from aix import supports, complete
 
@@ -316,6 +323,7 @@ a.system_fingerprint == b.system_fingerprint  # if this differs, the backend cha
 
 Generate vector embeddings for semantic search and similarity:
 
+<!-- wads-docs: skip needs a provider API key -->
 ```python
 from aix import embeddings, embed, cosine_similarity, find_most_similar
 
@@ -393,6 +401,7 @@ result = my_funcs.analyze(code="def foo(): return bar")
 
 `output_schema` above is flat and only requested in the prompt; nothing checks the reply against it. For anything nested (objects inside objects, arrays of objects, enums, required vs optional), pass `response_schema=`, either a Pydantic model or a JSON Schema dict. It works on `complete()`, `sample()` and `prompt_func()`:
 
+<!-- wads-docs: skip needs an Anthropic API key -->
 ```python
 from typing import Literal
 from pydantic import BaseModel
@@ -436,6 +445,7 @@ Every reply is also validated client-side. An invalid reply is re-asked up to `m
 
 Discover and filter models across providers:
 
+<!-- wads-docs: skip needs network discovery (models.discover) and an API key to chat -->
 ```python
 from aix import models
 
@@ -475,6 +485,7 @@ response = chat("Hello", model=model.id)
 
 Process multiple requests efficiently:
 
+<!-- wads-docs: skip needs a provider API key -->
 ```python
 from aix import batch_chat, batch_embeddings, BatchProcessor
 
@@ -507,6 +518,7 @@ processor.save_results("output.json")
 
 Generate images from text descriptions:
 
+<!-- wads-docs: skip needs a provider API key -->
 ```python
 from aix import generate_image, generate_images
 
@@ -539,6 +551,7 @@ variations = create_variation("original.png", n=3)
 
 Text-to-speech and speech-to-text:
 
+<!-- wads-docs: skip needs a provider API key -->
 ```python
 from aix import text_to_speech, transcribe, transcribe_with_timestamps
 
@@ -571,6 +584,7 @@ english_text = translate_audio("spanish_audio.mp3")
 
 Video generation with provider-specific implementations:
 
+<!-- wads-docs: skip video providers are not configured by default (raises NotImplementedError) -->
 ```python
 from aix import generate_video, get_video_providers
 
@@ -610,6 +624,7 @@ video = animate_image_to_video(
    export OPENROUTER_API_KEY=your-key-here
    ```
 3. Use OpenRouter models:
+   <!-- wads-docs: skip needs an OpenRouter API key; indented list fence -->
    ```python
    # Prefix models with 'openrouter/'
    chat("Hello", model="openrouter/openai/gpt-4o")
@@ -693,16 +708,19 @@ AIX builds on patterns from the `oa` package:OpenRouter
 
 ### Custom Model Sources
 
+<!-- wads-docs: skip needs network access (OpenRouter discovery) -->
 ```python
 from aix.ai_models import ModelManager, OpenRouterSource
 
 manager = ModelManager()
 source = OpenRouterSource()
+manager.register_source("openrouter", source)
 models = manager.discover_from_source("openrouter")
 ```
 
 ### Connector-Specific Metadata
 
+<!-- wads-docs: skip fragment; models comes from the discovery example above -->
 ```python
 # Get provider-specific parameters
 metadata = models.get_connector_metadata("openai/gpt-4o", "openai")
@@ -742,6 +760,7 @@ However, the new interfaces (`chat`, `embeddings`, `prompt_func`, `models`) are 
 
 ### Semantic Search
 
+<!-- wads-docs: skip needs a provider API key -->
 ```python
 from aix import embed, cosine_similarity
 
@@ -778,6 +797,7 @@ results = list(
 
 ### Multi-Model Comparison
 
+<!-- wads-docs: skip needs a provider API key -->
 ```python
 from aix import chat
 
@@ -8051,7 +8071,7 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-22 20:24 UTC** from commit <a href="https://github.com/addaix/aix/commit/97e3ab100fd1dfb357fe7df7989bfdb708601e2b"><code>97e3ab1</code></a> on branch <code>master</code>, for **aix 0.0.57** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 22:08 UTC** from commit <a href="https://github.com/addaix/aix/commit/c477fd01a66399ea0f57801e6b418f05ff12c94c"><code>c477fd0</code></a> on branch <code>master</code>, for **aix 0.0.57** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -8060,7 +8080,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/97e3ab100fd1dfb357fe7df7989bfdb708601e2b"><code>97e3ab100fd1dfb357fe7df7989bfdb708601e2b</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/c477fd01a66399ea0f57801e6b418f05ff12c94c"><code>c477fd01a66399ea0f57801e6b418f05ff12c94c</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -8071,9 +8091,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45066031026">45066031026</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45075859794">45075859794</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>97e3ab100fd1dfb357fe7df7989bfdb708601e2b</code> (in the history of the built commit) |
+| Event commit | <code>c477fd01a66399ea0f57801e6b418f05ff12c94c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8104,7 +8124,7 @@ Latest release: <a href="https://pypi.org/project/aix/0.0.57/">0.0.57</a>, the s
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 97e3ab100fd1dfb357fe7df7989bfdb708601e2b
+git checkout c477fd01a66399ea0f57801e6b418f05ff12c94c
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

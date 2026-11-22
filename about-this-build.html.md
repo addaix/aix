@@ -2,7 +2,7 @@
 
 # About this build
 
-This documentation was built on **2026-11-22 20:24 UTC** from commit <a href="https://github.com/addaix/aix/commit/97e3ab100fd1dfb357fe7df7989bfdb708601e2b"><code>97e3ab1</code></a> on branch <code>master</code>, for **aix 0.0.57** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 22:08 UTC** from commit <a href="https://github.com/addaix/aix/commit/c477fd01a66399ea0f57801e6b418f05ff12c94c"><code>c477fd0</code></a> on branch <code>master</code>, for **aix 0.0.57** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -11,7 +11,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/97e3ab100fd1dfb357fe7df7989bfdb708601e2b"><code>97e3ab100fd1dfb357fe7df7989bfdb708601e2b</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/c477fd01a66399ea0f57801e6b418f05ff12c94c"><code>c477fd01a66399ea0f57801e6b418f05ff12c94c</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -22,9 +22,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45066031026">45066031026</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45075859794">45075859794</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>97e3ab100fd1dfb357fe7df7989bfdb708601e2b</code> (in the history of the built commit) |
+| Event commit | <code>c477fd01a66399ea0f57801e6b418f05ff12c94c</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -55,7 +55,7 @@ Latest release: <a href="https://pypi.org/project/aix/0.0.57/">0.0.57</a>, the s
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 97e3ab100fd1dfb357fe7df7989bfdb708601e2b
+git checkout c477fd01a66399ea0f57801e6b418f05ff12c94c
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
