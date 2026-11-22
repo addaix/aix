@@ -72,7 +72,7 @@ class ModelStore(Mapping):
 
     def __init__(
         self, storage_path: Union[str, Path] = None, auto_discover: bool = False
-    ):
+    ) -> None:
         """Initialize model store.
 
         Args:

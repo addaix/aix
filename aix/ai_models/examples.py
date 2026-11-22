@@ -12,7 +12,7 @@ from aix.ai_models.manager import ModelManager
 # === Basic Usage ===
 
 
-def example_basic_usage():
+def example_basic_usage() -> None:
     """Basic model management workflow."""
     # Create manager with persistent storage
     manager = get_manager(storage_path="~/.config/ai_models.json")
@@ -46,7 +46,7 @@ def example_basic_usage():
         print(f"LangChain metadata for gpt-4: {langchain_meta}")
 
 
-def example_custom_metadata():
+def example_custom_metadata() -> None:
     """Working with custom metadata and tags."""
     manager = get_manager()
 
@@ -82,7 +82,7 @@ def example_custom_metadata():
     print(f"Production-ready group: {[m.id for m in group_models]}")
 
 
-def example_advanced_filtering():
+def example_advanced_filtering() -> None:
     """Advanced filtering with custom functions."""
     manager = get_manager()
 
@@ -111,7 +111,7 @@ def example_advanced_filtering():
     print(f"Models suitable for task: {[m.id for m in suitable_models]}")
 
 
-def example_connector_usage():
+def example_connector_usage() -> None:
     """Using connectors to format metadata for different clients."""
     manager = get_manager()
 
@@ -150,7 +150,7 @@ class ModelMall:
     ['by_provider', 'by_capability', 'local', 'remote', 'groups']
     """
 
-    def __init__(self, manager: ModelManager):
+    def __init__(self, manager: ModelManager) -> None:
         self._manager = manager
 
     def __getitem__(self, key: str | tuple[str, ...]) -> Any:
@@ -218,7 +218,7 @@ class ModelMall:
         return ["by_provider", "by_capability", "local", "remote", "groups"]
 
 
-def example_mall_usage():
+def example_mall_usage() -> None:
     """Using the ModelMall pattern for organized access."""
     manager = get_manager()
     manager.discover_from_source("openrouter", auto_register=True)
@@ -256,7 +256,7 @@ class HuggingFaceSource(ModelSource):
     Demonstrates how to add a new model source.
     """
 
-    def __init__(self, *, task: str = "text-generation", limit: int = 10):
+    def __init__(self, *, task: str = "text-generation", limit: int = 10) -> None:
         self._task = task
         self._limit = limit
 
@@ -290,7 +290,7 @@ class HuggingFaceSource(ModelSource):
             return
 
 
-def example_custom_source():
+def example_custom_source() -> None:
     """Using a custom source."""
     manager = get_manager()
 

@@ -88,7 +88,7 @@ class GeneratedAudio:
         text: str = None,
         voice: str = None,
         format: str = "mp3",
-    ):
+    ) -> None:
         """Initialize generated audio.
 
         Args:
@@ -112,7 +112,7 @@ class GeneratedAudio:
         """
         return self.data
 
-    def save(self, path: Union[str, Path]):
+    def save(self, path: Union[str, Path]) -> None:
         """Save audio to file.
 
         Args:
@@ -126,7 +126,7 @@ class GeneratedAudio:
         with open(path, "wb") as f:
             f.write(self.data)
 
-    def play(self):
+    def play(self) -> None:
         """Play the audio.
 
         Requires a system audio player or library like pygame/pyaudio.
@@ -188,7 +188,7 @@ class TranscriptionResult:
         duration: float = None,
         segments: list = None,
         model: str = None,
-    ):
+    ) -> None:
         """Initialize transcription result.
 
         Args:

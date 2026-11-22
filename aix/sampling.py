@@ -196,7 +196,7 @@ class Samples(list):
         n_requests: int = 0,
         n_usage_reports: int = 0,
         fallback_error: Optional[Exception] = None,
-    ):
+    ) -> None:
         super().__init__(samples)
         self.fallback_error = fallback_error
         self.strategy = strategy
@@ -239,7 +239,7 @@ class SamplingError(Exception):
     ``__cause__``.
     """
 
-    def __init__(self, message: str, *, samples: Optional[Samples] = None):
+    def __init__(self, message: str, *, samples: Optional[Samples] = None) -> None:
         # ``samples`` has a default so the exception survives pickling
         # (multiprocessing / joblib re-create it from ``args`` alone).
         super().__init__(message)

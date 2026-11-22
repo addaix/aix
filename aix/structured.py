@@ -112,7 +112,7 @@ class SchemaValidationError(ValueError):
         detail: The parse / validation message (what a repair prompt is told).
     """
 
-    def __init__(self, message: str, *, text: str = "", detail: str = ""):
+    def __init__(self, message: str, *, text: str = "", detail: str = "") -> None:
         super().__init__(message)
         self.text = text
         self.detail = detail or message

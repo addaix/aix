@@ -357,7 +357,7 @@ class MissingCredentialError(Exception):
         *,
         provider: Optional[str] = None,
         env_names: Optional[list[str]] = None,
-    ):
+    ) -> None:
         self.model_or_provider = model_or_provider
         self.provider = provider or infer_provider(model_or_provider)
         self.env_names = (

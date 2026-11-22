@@ -83,7 +83,7 @@ class ModelRegistry(MutableMapping[str, Model]):
     1
     """
 
-    def __init__(self, *, storage_path: Path | None = None):
+    def __init__(self, *, storage_path: Path | None = None) -> None:
         """Initialize registry with optional persistent storage."""
         self._models: dict[str, Model] = {}
         self._storage_path = storage_path
@@ -251,7 +251,7 @@ class ConnectorRegistry(MutableMapping[str, Connector]):
     True
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._connectors: dict[str, Connector] = {}
 
     def __setitem__(self, name: str, connector: Connector) -> None:
