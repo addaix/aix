@@ -52,6 +52,7 @@ from typing import Callable, Optional, Union
 __all__ = [
     "PROVIDER_ENV_VARS",
     "PROVIDER_CONSOLE_URLS",
+    "MODEL_PREFIX_PROVIDERS",
     "MissingCredentialError",
     "infer_provider",
     "provider_env_vars",
@@ -131,10 +132,48 @@ def provider_env_vars(provider: str) -> list[str]:
 # --------------------------------------------------------------------------- #
 
 
+# Model-id prefix -> provider, tried before LiteLLM's resolver so common ids are
+# classified offline (LiteLLM fetches its model-cost map from the network on
+# first use). Anything not listed here still goes through LiteLLM.
+MODEL_PREFIX_PROVIDERS: dict[str, str] = {
+    "gpt-": "openai",
+    "chatgpt-": "openai",
+    "dall-e-": "openai",
+    "gpt-image-": "openai",
+    "whisper-": "openai",
+    "tts-": "openai",
+    "text-embedding-": "openai",
+    "o1": "openai",
+    "o3": "openai",
+    "o4": "openai",
+    "claude-": "anthropic",
+    "gemini-": "gemini",
+    "mistral-": "mistral",
+    "deepseek-": "deepseek",
+    "grok-": "xai",
+}
+
+
+def _infer_provider_from_prefix(model: str) -> Optional[str]:
+    """Offline, prefix-based provider guess for a bare model id.
+
+    >>> _infer_provider_from_prefix("dall-e-3")
+    'openai'
+    >>> _infer_provider_from_prefix("claude-sonnet-4-5")
+    'anthropic'
+    >>> _infer_provider_from_prefix("openai/gpt-4o") is None  # prefixed: LiteLLM's job
+    True
+    """
+    for prefix, provider in MODEL_PREFIX_PROVIDERS.items():
+        if model.startswith(prefix):
+            return provider
+    return None
+
+
 def infer_provider(model_or_provider: Optional[str]) -> Optional[str]:
     """Infer the provider name from a model id (or pass through a provider name).
 
-    Uses LiteLLM's ``get_llm_provider`` when available. If ``model_or_provider``
+    Common model ids are classified offline by prefix (:data:`MODEL_PREFIX_PROVIDERS`); anything else uses LiteLLM's ``get_llm_provider`` when available. If ``model_or_provider``
     is already a known provider name (a key in :data:`PROVIDER_ENV_VARS`), it is
     returned as-is. Returns ``None`` if the provider cannot be determined.
 
@@ -151,6 +190,9 @@ def infer_provider(model_or_provider: Optional[str]) -> Optional[str]:
     # An explicit provider name short-circuits inference.
     if model_or_provider in PROVIDER_ENV_VARS:
         return model_or_provider
+    local = _infer_provider_from_prefix(model_or_provider)
+    if local is not None:
+        return local
     try:
         from litellm import get_llm_provider
 
