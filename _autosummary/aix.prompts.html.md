@@ -277,6 +277,14 @@ exactly as before.
 ['name', 'language']
 ```
 
+The signature lists every template field, keyword-only, with its default:
+
+```pycon
+>>> from inspect import signature
+>>> str(signature(prompt_func("{a} {b:x}")))
+"(*, a: str, b: str = 'x')"
+```
+
 * **Parameters:**
   * **template** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Prompt template with {var} placeholders for parameters
   * **output_schema** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict), [`type`](https://docs.python.org/3/builtins/functions.html#type)]) – Optional schema for structured output. Can be:

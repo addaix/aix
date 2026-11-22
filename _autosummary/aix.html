@@ -3377,6 +3377,12 @@ exactly as before.</p>
 <span class="go">['name', 'language']</span>
 </pre></div>
 </div>
+<p>The signature lists every template field, keyword-only, with its default:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">signature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">str</span><span class="p">(</span><span class="n">signature</span><span class="p">(</span><span class="n">prompt_func</span><span class="p">(</span><span class="s2">"</span><span class="si">{a}</span><span class="s2"> </span><span class="si">{b:x}</span><span class="s2">"</span><span class="p">)))</span>
+<span class="go">"(*, a: str, b: str = 'x')"</span>
+</pre></div>
+</div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -4230,7 +4236,7 @@ block keeps the scope for its lifetime.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=d61b860e"></script>
+</div><script src="../_static/documentation_options.js?v=f6aa1ce5"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

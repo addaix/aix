@@ -1,4 +1,4 @@
-> built 2026-11-22 14:12 UTC from 6e41b0f (master) · aix 0.0.55. Details: build_info.json
+> built 2026-11-22 14:14 UTC from 2a857ed (master) · aix 0.0.56. Details: build_info.json
 
 # index.html.md
 
@@ -5642,6 +5642,14 @@ exactly as before.
 ['name', 'language']
 ```
 
+The signature lists every template field, keyword-only, with its default:
+
+```pycon
+>>> from inspect import signature
+>>> str(signature(prompt_func("{a} {b:x}")))
+"(*, a: str, b: str = 'x')"
+```
+
 * **Parameters:**
   * **template** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Prompt template with {var} placeholders for parameters
   * **output_schema** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`dict`](https://docs.python.org/3/builtins/stdtypes.html#dict), [`type`](https://docs.python.org/3/builtins/functions.html#type)]) – Optional schema for structured output. Can be:
@@ -6729,6 +6737,14 @@ exactly as before.
 >>> greet = prompt_func("Greet {name} in {language:English}")
 >>> greet.param_names
 ['name', 'language']
+```
+
+The signature lists every template field, keyword-only, with its default:
+
+```pycon
+>>> from inspect import signature
+>>> str(signature(prompt_func("{a} {b:x}")))
+"(*, a: str, b: str = 'x')"
 ```
 
 * **Parameters:**
@@ -7990,18 +8006,18 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-22 14:12 UTC** from commit <a href="https://github.com/addaix/aix/commit/6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438"><code>6e41b0f</code></a> on branch <code>master</code>, for **aix 0.0.55** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 14:14 UTC** from commit <a href="https://github.com/addaix/aix/commit/2a857ed61fdfb0f906225b443053f75575575398"><code>2a857ed</code></a> on branch <code>master</code>, for **aix 0.0.56** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.55) is behind the latest release on PyPI (0.0.56): `pip install aix` gives newer code than these docs describe.
+- The documented version (0.0.56) is behind the latest release on PyPI (0.0.57): `pip install aix` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438"><code>6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/2a857ed61fdfb0f906225b443053f75575575398"><code>2a857ed61fdfb0f906225b443053f75575575398</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -8012,9 +8028,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45031364483">45031364483</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45031569816">45031569816</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438</code> (in the history of the built commit) |
+| Event commit | <code>2a857ed61fdfb0f906225b443053f75575575398</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8039,13 +8055,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.56/">0.0.56</a>, newer than the documented version (0.0.55).
+Latest release: <a href="https://pypi.org/project/aix/0.0.57/">0.0.57</a>, newer than the documented version (0.0.56).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438
+git checkout 2a857ed61fdfb0f906225b443053f75575575398
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

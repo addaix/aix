@@ -302,7 +302,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">get_type_hints</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">signature</span><span class="p">,</span> <span class="n">Parameter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">inspect</span><span class="w"> </span><span class="kn">import</span> <span class="n">signature</span><span class="p">,</span> <span class="n">Parameter</span><span class="p">,</span> <span class="n">Signature</span>
 
 <span class="c1"># Import from aix.chat</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">aix.chat</span><span class="w"> </span><span class="kn">import</span> <span class="n">chat</span><span class="p">,</span> <span class="n">complete</span><span class="p">,</span> <span class="n">DFLT_CHAT_MODEL</span>
@@ -611,6 +611,12 @@
 <span class="sd">    &gt;&gt;&gt; greet.param_names</span>
 <span class="sd">    ['name', 'language']</span>
 
+<span class="sd">    The signature lists every template field, keyword-only, with its default:</span>
+
+<span class="sd">    &gt;&gt;&gt; from inspect import signature</span>
+<span class="sd">    &gt;&gt;&gt; str(signature(prompt_func("{a} {b:x}")))</span>
+<span class="sd">    "(*, a: str, b: str = 'x')"</span>
+
 <span class="sd">    Args:</span>
 <span class="sd">        template: Prompt template with {var} placeholders for parameters</span>
 <span class="sd">        output_schema: Optional schema for structured output. Can be:</span>
@@ -750,6 +756,20 @@
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">generated_function</span><span class="o">.</span><span class="vm">__doc__</span> <span class="o">+=</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">Returns: Generated text"</span>
+
+    <span class="c1"># Expose the template fields to anything that reads signatures (CLI/MCP</span>
+    <span class="c1"># builders, IDEs, help()): keyword-only, template order, template defaults.</span>
+    <span class="n">generated_function</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">Signature</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">Parameter</span><span class="p">(</span>
+                <span class="n">param</span><span class="p">,</span>
+                <span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span>
+                <span class="n">default</span><span class="o">=</span><span class="n">template_defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">),</span>
+                <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_names</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="c1"># Add metadata</span>
     <span class="n">generated_function</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">template</span>
@@ -1517,7 +1537,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=d61b860e"></script>
+</div><script src="../../_static/documentation_options.js?v=f6aa1ce5"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
