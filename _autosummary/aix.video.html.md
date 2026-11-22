@@ -81,6 +81,8 @@ Save video to file.
 
 * **Parameters:**
   **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -98,6 +100,8 @@ Wait for video generation to complete (for async operations).
 * **Raises:**
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If generation doesn’t complete within max_wait
   * [**RuntimeError**](https://docs.python.org/3/builtins/exceptions.html#RuntimeError) – If generation fails
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### aix.video.animate_image(image_path, prompt=None, , model=None, duration=3.0, motion_strength=0.5, \*\*kwargs)
 

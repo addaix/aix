@@ -74,12 +74,17 @@ Requires a system audio player or library like pygame/pyaudio.
 >>> audio.play()
 ```
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### save(path)
 
 Save audio to file.
 
 * **Parameters:**
   **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 

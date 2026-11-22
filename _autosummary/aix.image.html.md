@@ -90,6 +90,8 @@ Save image to file.
 * **Parameters:**
   * **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
   * **format** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Image format (e.g., ‘PNG’, ‘JPEG’). Auto-detected from path if None.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -109,6 +111,9 @@ Requires PIL (Pillow) to be installed.
 ```pycon
 >>> img.show()
 ```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### aix.image.create_variation(image_path, , model=None, size=None, n=1, api_key=None, \*\*kwargs)
 

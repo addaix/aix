@@ -320,7 +320,7 @@
         <span class="n">resolution</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"completed"</span><span class="p">,</span>
         <span class="n">task_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="p">):</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Initialize generated video.</span>
 
 <span class="sd">        Args:</span>
@@ -370,7 +370,7 @@
 
 <div class="viewcode-block" id="GeneratedVideo.save">
 <a class="viewcode-back" href="../../_autosummary/aix.video.html#aix.GeneratedVideo.save">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Save video to file.</span>
 
 <span class="sd">        Args:</span>
@@ -388,7 +388,7 @@
 
 <div class="viewcode-block" id="GeneratedVideo.wait_until_complete">
 <a class="viewcode-back" href="../../_autosummary/aix.video.html#aix.GeneratedVideo.wait_until_complete">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">wait_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_wait</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">wait_until_complete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_wait</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> <span class="n">poll_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""Wait for video generation to complete (for async operations).</span>
 
 <span class="sd">        Args:</span>

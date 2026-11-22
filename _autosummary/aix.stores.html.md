@@ -16,6 +16,8 @@ Register a decoder function for a given file extension.
 * **Parameters:**
   * **ext** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – The file extension (without the leading dot), e.g., “pdf”.
   * **decoder** (*Callable* *[* *[*[*bytes*](https://docs.python.org/3/builtins/stdtypes.html#bytes) *]* *,* [*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]*) – A function that takes bytes and returns a decoded string.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### aix.stores.extension_based_decode_to_text(k, v)
 

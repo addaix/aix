@@ -104,6 +104,9 @@ progress tracking, error handling, and result caching.
 
 Clear stored results and errors.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### process_chats(prompts, \*\*kwargs)
 
 Process chat prompts and store results.
@@ -134,6 +137,8 @@ Save results to file.
 
 * **Parameters:**
   **filepath** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to save results (JSON)
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### aix.batches.batch_chat(prompts, , model=None, batch_size=None, max_workers=None, show_progress=False, on_error='return', \*\*chat_kwargs)
 

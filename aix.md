@@ -1,4 +1,4 @@
-> built 2026-11-22 14:38 UTC from a5d55f1 (master) · aix 0.0.57. Details: build_info.json
+> built 2026-11-22 20:24 UTC from 97e3ab1 (master) · aix 0.0.57. Details: build_info.json
 
 # index.html.md
 
@@ -2040,12 +2040,17 @@ Requires a system audio player or library like pygame/pyaudio.
 >>> audio.play()
 ```
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### save(path)
 
 Save audio to file.
 
 * **Parameters:**
   **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -2324,6 +2329,9 @@ progress tracking, error handling, and result caching.
 
 Clear stored results and errors.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### process_chats(prompts, \*\*kwargs)
 
 Process chat prompts and store results.
@@ -2354,6 +2362,8 @@ Save results to file.
 
 * **Parameters:**
   **filepath** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to save results (JSON)
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### aix.batches.batch_chat(prompts, , model=None, batch_size=None, max_workers=None, show_progress=False, on_error='return', \*\*chat_kwargs)
 
@@ -3377,6 +3387,9 @@ progress tracking, error handling, and result caching.
 
 Clear stored results and errors.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### process_chats(prompts, \*\*kwargs)
 
 Process chat prompts and store results.
@@ -3407,6 +3420,8 @@ Save results to file.
 
 * **Parameters:**
   **filepath** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to save results (JSON)
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* aix.ChatSession(system_prompt=None, , model=None, \*\*chat_kwargs)
 
@@ -3432,6 +3447,8 @@ Clear conversation history.
 
 * **Parameters:**
   **keep_system** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – If True, preserve system message (if any)
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 #### send(message, \*\*kwargs)
 
@@ -3616,6 +3633,9 @@ True
 
 Clear the cache.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### embed(text, force_refresh=False)
 
 Get embedding for text, using cache if available.
@@ -3677,12 +3697,17 @@ Requires a system audio player or library like pygame/pyaudio.
 >>> audio.play()
 ```
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### save(path)
 
 Save audio to file.
 
 * **Parameters:**
   **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -3733,6 +3758,8 @@ Save image to file.
 * **Parameters:**
   * **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
   * **format** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Image format (e.g., ‘PNG’, ‘JPEG’). Auto-detected from path if None.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -3752,6 +3779,9 @@ Requires PIL (Pillow) to be installed.
 ```pycon
 >>> img.show()
 ```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* aix.GeneratedVideo(url=None, data=None, model=None, prompt=None, duration=None, resolution=None, status='completed', task_id=None)
 
@@ -3785,6 +3815,8 @@ Save video to file.
 
 * **Parameters:**
   **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -3802,6 +3834,8 @@ Wait for video generation to complete (for async operations).
 * **Raises:**
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If generation doesn’t complete within max_wait
   * [**RuntimeError**](https://docs.python.org/3/builtins/exceptions.html#RuntimeError) – If generation fails
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* aix.ImageComparison(match, confidence, explanation, aspects=tuple(), model=None, usage=None)
 
@@ -6237,6 +6271,8 @@ Save image to file.
 * **Parameters:**
   * **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
   * **format** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Image format (e.g., ‘PNG’, ‘JPEG’). Auto-detected from path if None.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -6256,6 +6292,9 @@ Requires PIL (Pillow) to be installed.
 ```pycon
 >>> img.show()
 ```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### aix.image.create_variation(image_path, , model=None, size=None, n=1, api_key=None, \*\*kwargs)
 
@@ -7162,6 +7201,8 @@ Register a decoder function for a given file extension.
 * **Parameters:**
   * **ext** ([*str*](https://docs.python.org/3/builtins/stdtypes.html#str)) – The file extension (without the leading dot), e.g., “pdf”.
   * **decoder** (*Callable* *[* *[*[*bytes*](https://docs.python.org/3/builtins/stdtypes.html#bytes) *]* *,* [*str*](https://docs.python.org/3/builtins/stdtypes.html#str) *]*) – A function that takes bytes and returns a decoded string.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### aix.stores.extension_based_decode_to_text(k, v)
 
@@ -7427,6 +7468,8 @@ Save video to file.
 
 * **Parameters:**
   **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -7444,6 +7487,8 @@ Wait for video generation to complete (for async operations).
 * **Raises:**
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If generation doesn’t complete within max_wait
   * [**RuntimeError**](https://docs.python.org/3/builtins/exceptions.html#RuntimeError) – If generation fails
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### aix.video.animate_image(image_path, prompt=None, , model=None, duration=3.0, motion_strength=0.5, \*\*kwargs)
 
@@ -8006,7 +8051,7 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-22 14:38 UTC** from commit <a href="https://github.com/addaix/aix/commit/a5d55f1bac0be72bdb61a334b8e7476c233e3130"><code>a5d55f1</code></a> on branch <code>master</code>, for **aix 0.0.57** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 20:24 UTC** from commit <a href="https://github.com/addaix/aix/commit/97e3ab100fd1dfb357fe7df7989bfdb708601e2b"><code>97e3ab1</code></a> on branch <code>master</code>, for **aix 0.0.57** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -8015,7 +8060,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/a5d55f1bac0be72bdb61a334b8e7476c233e3130"><code>a5d55f1bac0be72bdb61a334b8e7476c233e3130</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/97e3ab100fd1dfb357fe7df7989bfdb708601e2b"><code>97e3ab100fd1dfb357fe7df7989bfdb708601e2b</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -8026,9 +8071,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45033684024">45033684024</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45066031026">45066031026</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>a5d55f1bac0be72bdb61a334b8e7476c233e3130</code> (in the history of the built commit) |
+| Event commit | <code>97e3ab100fd1dfb357fe7df7989bfdb708601e2b</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8059,7 +8104,7 @@ Latest release: <a href="https://pypi.org/project/aix/0.0.57/">0.0.57</a>, the s
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout a5d55f1bac0be72bdb61a334b8e7476c233e3130
+git checkout 97e3ab100fd1dfb357fe7df7989bfdb708601e2b
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

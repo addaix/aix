@@ -209,6 +209,9 @@ progress tracking, error handling, and result caching.
 
 Clear stored results and errors.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### process_chats(prompts, \*\*kwargs)
 
 Process chat prompts and store results.
@@ -239,6 +242,8 @@ Save results to file.
 
 * **Parameters:**
   **filepath** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to save results (JSON)
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* aix.ChatSession(system_prompt=None, , model=None, \*\*chat_kwargs)
 
@@ -264,6 +269,8 @@ Clear conversation history.
 
 * **Parameters:**
   **keep_system** ([`bool`](https://docs.python.org/3/builtins/functions.html#bool)) – If True, preserve system message (if any)
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 #### send(message, \*\*kwargs)
 
@@ -448,6 +455,9 @@ True
 
 Clear the cache.
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### embed(text, force_refresh=False)
 
 Get embedding for text, using cache if available.
@@ -509,12 +519,17 @@ Requires a system audio player or library like pygame/pyaudio.
 >>> audio.play()
 ```
 
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 #### save(path)
 
 Save audio to file.
 
 * **Parameters:**
   **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -565,6 +580,8 @@ Save image to file.
 * **Parameters:**
   * **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
   * **format** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Image format (e.g., ‘PNG’, ‘JPEG’). Auto-detected from path if None.
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -584,6 +601,9 @@ Requires PIL (Pillow) to be installed.
 ```pycon
 >>> img.show()
 ```
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* aix.GeneratedVideo(url=None, data=None, model=None, prompt=None, duration=None, resolution=None, status='completed', task_id=None)
 
@@ -617,6 +637,8 @@ Save video to file.
 
 * **Parameters:**
   **path** ([`Union`](https://docs.python.org/3/library/typing.html#typing.Union)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str), [`Path`](https://docs.python.org/3/library/pathlib.html#pathlib.Path)]) – Output file path
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### Examples
 
@@ -634,6 +656,8 @@ Wait for video generation to complete (for async operations).
 * **Raises:**
   * [**TimeoutError**](https://docs.python.org/3/builtins/exceptions.html#TimeoutError) – If generation doesn’t complete within max_wait
   * [**RuntimeError**](https://docs.python.org/3/builtins/exceptions.html#RuntimeError) – If generation fails
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
 
 ### *class* aix.ImageComparison(match, confidence, explanation, aspects=tuple(), model=None, usage=None)
 
