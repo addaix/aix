@@ -34,7 +34,7 @@ import string as _string
 from collections.abc import Callable
 from typing import Union, Any, Literal, get_type_hints
 from functools import wraps
-from inspect import signature, Parameter
+from inspect import signature, Parameter, Signature
 
 # Import from aix.chat
 from aix.chat import chat, complete, DFLT_CHAT_MODEL
@@ -341,6 +341,12 @@ def prompt_func(
     >>> greet.param_names
     ['name', 'language']
 
+    The signature lists every template field, keyword-only, with its default:
+
+    >>> from inspect import signature
+    >>> str(signature(prompt_func("{a} {b:x}")))
+    "(*, a: str, b: str = 'x')"
+
     Args:
         template: Prompt template with {var} placeholders for parameters
         output_schema: Optional schema for structured output. Can be:
@@ -480,6 +486,20 @@ def prompt_func(
         )
     else:
         generated_function.__doc__ += "\nReturns: Generated text"
+
+    # Expose the template fields to anything that reads signatures (CLI/MCP
+    # builders, IDEs, help()): keyword-only, template order, template defaults.
+    generated_function.__signature__ = Signature(
+        [
+            Parameter(
+                param,
+                Parameter.KEYWORD_ONLY,
+                default=template_defaults.get(param, Parameter.empty),
+                annotation=str,
+            )
+            for param in param_names
+        ]
+    )
 
     # Add metadata
     generated_function.template = template
