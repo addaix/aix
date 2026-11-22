@@ -120,7 +120,7 @@ True
 
 Infer the provider name from a model id (or pass through a provider name).
 
-Uses LiteLLM’s `get_llm_provider` when available. If `model_or_provider`
+Common model ids are classified offline by prefix (`MODEL_PREFIX_PROVIDERS`); anything else uses LiteLLM’s `get_llm_provider` when available. If `model_or_provider`
 is already a known provider name (a key in `PROVIDER_ENV_VARS`), it is
 returned as-is. Returns `None` if the provider cannot be determined.
 

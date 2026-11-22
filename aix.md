@@ -1,4 +1,4 @@
-> built 2026-11-06 11:15 UTC from ecc5986 (master) · aix 0.0.54. Details: build_info.json
+> built 2026-11-22 14:12 UTC from 6e41b0f (master) · aix 0.0.55. Details: build_info.json
 
 # index.html.md
 
@@ -3022,7 +3022,7 @@ True
 
 Infer the provider name from a model id (or pass through a provider name).
 
-Uses LiteLLM’s `get_llm_provider` when available. If `model_or_provider`
+Common model ids are classified offline by prefix (`MODEL_PREFIX_PROVIDERS`); anything else uses LiteLLM’s `get_llm_provider` when available. If `model_or_provider`
 is already a known provider name (a key in `PROVIDER_ENV_VARS`), it is
 returned as-is. Returns `None` if the provider cannot be determined.
 
@@ -7990,37 +7990,37 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-06 11:15 UTC** from commit <a href="https://github.com/thorwhalen/aix/commit/ecc59864a480cc1cc453a557e7602f6d14a71025"><code>ecc5986</code></a> on branch <code>master</code>, for **aix 0.0.54** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-22 14:12 UTC** from commit <a href="https://github.com/addaix/aix/commit/6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438"><code>6e41b0f</code></a> on branch <code>master</code>, for **aix 0.0.55** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.54) is behind the latest release on PyPI (0.0.55): `pip install aix` gives newer code than these docs describe.
+- The documented version (0.0.55) is behind the latest release on PyPI (0.0.56): `pip install aix` gives newer code than these docs describe.
 
 ## Source
 
-|                     |                                                                                                                                                       |
-|---------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/thorwhalen/aix/commit/ecc59864a480cc1cc453a557e7602f6d14a71025"><code>ecc59864a480cc1cc453a557e7602f6d14a71025</code></a> |
-| Branch              | <code>master</code>                                                                                                                                   |
-| Tags at this commit | none                                                                                                                                                  |
-| Working tree        | clean                                                                                                                                                 |
-| Remote              | <code>https://github.com/thorwhalen/aix</code>                                                                                                        |
+|                     |                                                                                                                                                   |
+|---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| Commit              | <a href="https://github.com/addaix/aix/commit/6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438"><code>6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438</code></a> |
+| Branch              | <code>master</code>                                                                                                                               |
+| Tags at this commit | none                                                                                                                                              |
+| Working tree        | clean                                                                                                                                             |
+| Remote              | <code>https://github.com/addaix/aix</code>                                                                                                        |
 
 ## Continuous integration
 
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
-| Repository   | <code>thorwhalen/aix</code>                                                                |
-| Run          | <a href="https://github.com/thorwhalen/aix/actions/runs/42208576292">42208576292</a>       |
+| Repository   | <code>addaix/aix</code>                                                                    |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45031364483">45031364483</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>ecc59864a480cc1cc453a557e7602f6d14a71025</code> (in the history of the built commit) |
+| Event commit | <code>6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.22  |
+| epythet  | 0.2.23  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.16 |
@@ -8039,14 +8039,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.55/">0.0.55</a>, newer than the documented version (0.0.54).
+Latest release: <a href="https://pypi.org/project/aix/0.0.56/">0.0.56</a>, newer than the documented version (0.0.55).
 
 ## Reproduce
 
 ```bash
-git clone https://github.com/thorwhalen/aix && cd aix
-git checkout ecc59864a480cc1cc453a557e7602f6d14a71025
-pip install "epythet==0.2.22"
+git clone https://github.com/addaix/aix && cd aix
+git checkout 6e41b0ffcb15072ba91c2ef4b9dae6ec11e5a438
+pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 
