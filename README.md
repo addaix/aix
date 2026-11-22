@@ -391,6 +391,10 @@ my_funcs.add("fix_bugs", "Fix bugs in: {code}")
 result = my_funcs.analyze(code="def foo(): return bar")
 ```
 
+#### `prompt_func` and prompt-optimisation frameworks
+
+`prompt_func` is for prompts whose template is *data*: a string constant, or a template loaded from a store at run time. Parameters and `{name:default}` defaults come from the template, `egress=` turns the reply into a typed value, and model and credentials come from aix's configuration. If you would rather declare inputs and outputs and let a framework write and optimise the prompt against a metric, use [DSPy](https://github.com/stanfordnlp/dspy) instead; it does a different job. If your prompts are hand-written Python functions that return a string, [Mirascope](https://github.com/Mirascope/mirascope) fits that style.
+
 #### Enforced, validated structured output
 
 `output_schema` above is flat and only requested in the prompt; nothing checks the reply against it. For anything nested (objects inside objects, arrays of objects, enums, required vs optional), pass `response_schema=`, either a Pydantic model or a JSON Schema dict. It works on `complete()`, `sample()` and `prompt_func()`:
