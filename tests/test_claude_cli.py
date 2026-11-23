@@ -90,3 +90,50 @@ def test_multi_turn_becomes_a_transcript():
         ]
     )
     assert system == "" and stdin == "User: a\n\nAssistant: b\n\nUser: c"
+
+
+@pytest.mark.parametrize(
+    "kw", [{"top_p": 0.1}, {"stop": ["x"]}, {"tools": [{"type": "function"}]}, {"api_key": "sk-x"}]
+)
+def test_any_other_argument_is_refused_not_dropped(fake_cli, kw):
+    """Not only the five named sampling controls (#91)."""
+    with pytest.raises(ValueError, match=next(iter(kw))):
+        aix.chat("hi", model="claude-cli/haiku", **kw)
+    with pytest.raises(ValueError, match=next(iter(kw))):
+        aix.complete("hi", model="claude-cli/haiku", **kw)
+    assert not fake_cli
+
+
+def test_a_non_text_content_part_is_refused(fake_cli):
+    message = {
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "what is in this image?"},
+            {"type": "image_url", "image_url": {"url": "data:image/png;base64,AAAA"}},
+        ],
+    }
+    with pytest.raises(ValueError, match="image_url"):
+        aix.chat([message], model="claude-cli/haiku")
+    assert not fake_cli
+
+
+def test_the_auth_token_is_removed_and_the_cwd_is_private(fake_cli, monkeypatch):
+    """ANTHROPIC_AUTH_TOKEN would bill the API too; the shared temp dir could hold a
+    planted .claude/settings.json (#91)."""
+    import os
+    import tempfile
+
+    monkeypatch.setenv("ANTHROPIC_AUTH_TOKEN", "tok-must-not-leak")
+    aix.chat("hi", model="claude-cli/haiku")
+    _, kw = fake_cli[0]
+    assert "ANTHROPIC_AUTH_TOKEN" not in kw["env"]
+    assert kw["cwd"] != tempfile.gettempdir()
+    assert os.path.basename(kw["cwd"]).startswith("aix-claude-cli-")
+    assert not os.path.exists(kw["cwd"])  # removed after the call
+
+
+@pytest.mark.parametrize("model", ["claude-cli/", "claude-cli/--debug", "claude-cli/a b"])
+def test_a_flag_shaped_or_empty_model_name_is_refused(fake_cli, model):
+    with pytest.raises(ValueError, match="model name"):
+        aix.chat("hi", model=model)
+    assert not fake_cli

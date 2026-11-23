@@ -13,9 +13,10 @@ The CLI exposes no sampling controls, so ``temperature``, ``max_tokens``, ``seed
 cost the CLI reports is on ``Completion.raw["total_cost_usd"]`` (see
 :func:`claude_cli_cost`).
 
-Notes: ``ANTHROPIC_API_KEY`` is removed from the child environment (the CLI would
-otherwise bill that key, not the subscription); ``--bare`` is never used, since it skips
-the keychain read that finds the subscription login; the call runs in a neutral cwd with
+Notes: ``ANTHROPIC_API_KEY`` and ``ANTHROPIC_AUTH_TOKEN`` are removed from the child
+environment (the CLI would otherwise bill them, not the subscription); ``--bare`` is never used, since it skips
+the keychain read that finds the subscription login; the call runs in a fresh private
+temporary folder with
 no tools, MCP servers, slash commands or session persistence.
 """
 
@@ -30,6 +31,9 @@ from typing import Any, Callable, Iterable, Optional
 
 CLAUDE_CLI_PREFIX = "claude-cli/"
 CLAUDE_CLI_INSTALL_URL = "https://docs.claude.com/en/docs/claude-code/setup"
+
+#: Environment variables removed from the ``claude`` child: either one would bill the API.
+_API_CREDENTIAL_VARS = frozenset({"ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN"})
 
 #: ``chat``/``complete`` arguments the CLI cannot honour: refused, not dropped.
 UNSUPPORTED_PARAMS = (
@@ -65,13 +69,27 @@ def _split_messages(messages: Iterable[dict]) -> tuple[str, str]:
     system, turns = [], []
     for m in messages:
         content = m.get("content")
-        text = (
-            content
-            if isinstance(content, str)
-            else "".join(
-                p.get("text", "") for p in (content or []) if isinstance(p, dict)
-            )
-        )
+        if isinstance(content, str) or content is None:
+            text = content or ""
+        else:
+            parts = list(content)
+            other = [
+                p
+                for p in parts
+                if not (isinstance(p, dict) and p.get("type", "text") == "text")
+            ]
+            if other:  # an image or audio part would be dropped in silence (#91)
+                kinds = sorted(
+                    {
+                        str(p.get("type")) if isinstance(p, dict) else type(p).__name__
+                        for p in other
+                    }
+                )
+                raise ValueError(
+                    f"claude-cli/ models take text only; this message has {', '.join(kinds)} "
+                    "content. Use an API model for it."
+                )
+            text = "".join(p.get("text", "") for p in parts)
         (system if m.get("role") == "system" else turns).append((m.get("role"), text))
     if len(turns) == 1 and turns[0][0] == "user":
         stdin = turns[0][1]
@@ -98,6 +116,10 @@ def claude_cli_complete(
     from aix.chat import Completion, Usage
 
     name = model[len(CLAUDE_CLI_PREFIX) :]
+    if not name or name.startswith("-") or any(c.isspace() for c in name):
+        raise ValueError(
+            f"Not a claude-cli/ model name: {name!r} (e.g. 'haiku', 'opus')"
+        )
     system, stdin = _split_messages(messages)
     argv = [
         "claude", "-p", "--model", name, "--output-format", "json",
@@ -107,16 +129,20 @@ def claude_cli_complete(
     ]  # fmt: skip
     if system:
         argv += ["--system-prompt", system]
-    env = {k: v for k, v in os.environ.items() if k != "ANTHROPIC_API_KEY"}
-    proc = (runner or subprocess.run)(
-        argv,
-        input=stdin,
-        capture_output=True,
-        text=True,
-        env=env,
-        cwd=cwd or tempfile.gettempdir(),
-        timeout=timeout,
-    )
+    # Both credentials would make the CLI bill the API rather than the subscription.
+    env = {k: v for k, v in os.environ.items() if k not in _API_CREDENTIAL_VARS}
+    # A fresh private folder, not the shared temp dir: with --setting-sources project,
+    # a .claude/settings.json someone planted there would be loaded (#91).
+    with tempfile.TemporaryDirectory(prefix="aix-claude-cli-") as neutral:
+        proc = (runner or subprocess.run)(
+            argv,
+            input=stdin,
+            capture_output=True,
+            text=True,
+            env=env,
+            cwd=cwd or neutral,
+            timeout=timeout,
+        )
     try:
         data = json.loads(proc.stdout)
     except (TypeError, ValueError):
@@ -155,8 +181,13 @@ def claude_cli_cost(completion) -> float:
 
 
 def refuse_unsupported(**params: Any) -> None:
-    """Raise ``ValueError`` for any set parameter the CLI cannot honour."""
+    """Raise ``ValueError`` for any set parameter the CLI cannot honour: the named
+    sampling controls, an ``api_key``, and any other keyword (``top_p``, ``stop``,
+    ``tools``...), which would otherwise be dropped in silence (#91)."""
+    known = {*UNSUPPORTED_PARAMS, "stream", "n", "api_key", "max_repairs"}
     set_ = [k for k in UNSUPPORTED_PARAMS if params.get(k) is not None]
+    set_ += [k for k in ("api_key", "max_repairs") if params.get(k) is not None]
+    set_ += [k for k, v in params.items() if k not in known and v is not None]
     if params.get("stream"):
         set_.append("stream")
     if params.get("n", 1) != 1:
