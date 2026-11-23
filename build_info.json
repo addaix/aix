@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-22T23:13:11Z",
+  "built_at": "2026-11-23T02:34:50Z",
   "package": {
     "name": "aix",
-    "version": "0.0.57",
+    "version": "0.0.58",
     "display_name": "aix",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459",
-    "short_commit": "9c28a45",
+    "commit": "fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47",
+    "short_commit": "fdc42c9",
     "branch": "master",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/addaix/aix",
-    "commit_url": "https://github.com/addaix/aix/commit/9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459",
+    "commit_url": "https://github.com/addaix/aix/commit/fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "addaix/aix",
-    "sha": "9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459",
+    "sha": "fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "45081809401",
-    "run_url": "https://github.com/addaix/aix/actions/runs/45081809401",
+    "run_id": "45100802796",
+    "run_url": "https://github.com/addaix/aix/actions/runs/45100802796",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -56,20 +56,20 @@
   },
   "site": {
     "modules_documented": 23,
-    "objects_documented": 395
+    "objects_documented": 397
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.58",
+    "latest": "0.0.59",
     "relation": "behind",
     "error": null
   },
-  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout 9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47\npip install \"epythet==0.2.23\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": false,
     "notes": [
-      "The documented version (0.0.57) is behind the latest release on PyPI (0.0.58): `pip install aix` gives newer code than these docs describe."
+      "The documented version (0.0.58) is behind the latest release on PyPI (0.0.59): `pip install aix` gives newer code than these docs describe."
     ]
   }
 }

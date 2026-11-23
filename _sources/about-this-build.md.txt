@@ -5,19 +5,19 @@ orphan: true
 
 # About this build
 
-This documentation was built on **2026-11-22 23:13 UTC** from commit <a href="https://github.com/addaix/aix/commit/9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459"><code>9c28a45</code></a> on branch <code>master</code>, for **aix 0.0.57** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 02:34 UTC** from commit <a href="https://github.com/addaix/aix/commit/fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47"><code>fdc42c9</code></a> on branch <code>master</code>, for **aix 0.0.58** (from <code>pyproject.toml</code>).
 
 :::{warning}
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.57) is behind the latest release on PyPI (0.0.58): `pip install aix` gives newer code than these docs describe.
+- The documented version (0.0.58) is behind the latest release on PyPI (0.0.59): `pip install aix` gives newer code than these docs describe.
 :::
 
 ## Source
 
 | | |
 |---|---|
-| Commit | <a href="https://github.com/addaix/aix/commit/9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459"><code>9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459</code></a> |
+| Commit | <a href="https://github.com/addaix/aix/commit/fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47"><code>fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47</code></a> |
 | Branch | <code>master</code> |
 | Tags at this commit | none |
 | Working tree | clean |
@@ -28,9 +28,9 @@ The documentation and the package may be misaligned:
 | | |
 |---|---|
 | Repository | <code>addaix/aix</code> |
-| Run | <a href="https://github.com/addaix/aix/actions/runs/45081809401">45081809401</a> |
+| Run | <a href="https://github.com/addaix/aix/actions/runs/45100802796">45100802796</a> |
 | Ref | <code>refs/heads/master</code> |
-| Event commit | <code>9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459</code> (in the history of the built commit) |
+| Event commit | <code>fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -55,13 +55,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.58/">0.0.58</a>, newer than the documented version (0.0.57).
+Latest release: <a href="https://pypi.org/project/aix/0.0.59/">0.0.59</a>, newer than the documented version (0.0.58).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459
+git checkout fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

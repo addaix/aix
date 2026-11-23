@@ -47,10 +47,16 @@ Security:
   [`check_keys()`](#aix.credentials.check_keys) reports availability only. Keys live in the user
   app-config folder, never in the repo.
 
+### Module Attributes
+
+| [`KEYLESS_MODEL_PREFIXES`](#aix.credentials.KEYLESS_MODEL_PREFIXES)   | Model-id prefixes whose provider runs locally and needs no API key (extend to add more).   |
+|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+
 ### Functions
 
-| [`infer_provider`](#aix.credentials.infer_provider)(model_or_provider)                | Infer the provider name from a model id (or pass through a provider name).   |
+| [`is_keyless`](#aix.credentials.is_keyless)(model_or_provider)                    | True when the model is served by a local provider that needs no API key.     |
 |---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| [`infer_provider`](#aix.credentials.infer_provider)(model_or_provider)                | Infer the provider name from a model id (or pass through a provider name).   |
 | [`provider_env_vars`](#aix.credentials.provider_env_vars)(provider)                      | Return the env-var name(s) for `provider` as a list (possibly empty).        |
 | [`resolve_api_key`](#aix.credentials.resolve_api_key)(model_or_provider, \*[, ...])    | Resolve an API key for `model_or_provider` through the documented layers.    |
 | [`check_requirements`](#aix.credentials.check_requirements)(model_or_provider, \*[, ...]) | Presence-only preflight: ensure a key for `model_or_provider` is resolvable. |
@@ -61,6 +67,10 @@ Security:
 
 | [`MissingCredentialError`](#aix.credentials.MissingCredentialError)(model_or_provider, \*)   | Raised when a required API key cannot be resolved.   |
 |--------------------------------------------------------------------------------------------------|------------------------------------------------------|
+
+### aix.credentials.KEYLESS_MODEL_PREFIXES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('ollama/', 'ollama_chat/')*
+
+Model-id prefixes whose provider runs locally and needs no API key (extend to add more).
 
 ### *exception* aix.credentials.MissingCredentialError(model_or_provider, , provider=None, env_names=None)
 
@@ -104,12 +114,15 @@ Does *not* validate the key over the network – only that one is discoverable
 via [`resolve_api_key()`](#aix.credentials.resolve_api_key) (explicit arg, env/.env, or store). Raises
 [`MissingCredentialError`](#aix.credentials.MissingCredentialError) with actionable guidance when absent.
 
-Returns `True` when a key is available.
+Returns `True` when a key is available, or when the model is local and
+needs none ([`is_keyless()`](#aix.credentials.is_keyless), e.g. `ollama/...`).
 
 ### Examples
 
 ```pycon
 >>> check_requirements("gpt-4o", api_key="sk-explicit")
+True
+>>> check_requirements("ollama/mistral")
 True
 ```
 
@@ -137,6 +150,20 @@ True
 
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### aix.credentials.is_keyless(model_or_provider)
+
+True when the model is served by a local provider that needs no API key.
+
+```pycon
+>>> is_keyless("ollama/mistral:7b-instruct-q6_K")
+True
+>>> is_keyless("gpt-4o")
+False
+```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ### aix.credentials.provider_env_vars(provider)
 

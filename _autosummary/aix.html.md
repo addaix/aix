@@ -1684,12 +1684,15 @@ Does *not* validate the key over the network – only that one is discoverable
 via [`resolve_api_key()`](#aix.resolve_api_key) (explicit arg, env/.env, or store). Raises
 [`MissingCredentialError`](#aix.MissingCredentialError) with actionable guidance when absent.
 
-Returns `True` when a key is available.
+Returns `True` when a key is available, or when the model is local and
+needs none (`is_keyless()`, e.g. `ollama/...`).
 
 ### Examples
 
 ```pycon
 >>> check_requirements("gpt-4o", api_key="sk-explicit")
+True
+>>> check_requirements("ollama/mistral")
 True
 ```
 

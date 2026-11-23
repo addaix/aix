@@ -1,4 +1,4 @@
-> built 2026-11-22 23:13 UTC from 9c28a45 (master) · aix 0.0.57. Details: build_info.json
+> built 2026-11-23 02:34 UTC from fdc42c9 (master) · aix 0.0.58. Details: build_info.json
 
 # index.html.md
 
@@ -2983,10 +2983,16 @@ Security:
   [`check_keys()`](_autosummary/aix.credentials.html.md#aix.credentials.check_keys) reports availability only. Keys live in the user
   app-config folder, never in the repo.
 
+### Module Attributes
+
+| [`KEYLESS_MODEL_PREFIXES`](_autosummary/aix.credentials.html.md#aix.credentials.KEYLESS_MODEL_PREFIXES)   | Model-id prefixes whose provider runs locally and needs no API key (extend to add more).   |
+|---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------|
+
 ### Functions
 
-| [`infer_provider`](_autosummary/aix.credentials.html.md#aix.credentials.infer_provider)(model_or_provider)                | Infer the provider name from a model id (or pass through a provider name).   |
+| [`is_keyless`](_autosummary/aix.credentials.html.md#aix.credentials.is_keyless)(model_or_provider)                    | True when the model is served by a local provider that needs no API key.     |
 |---------------------------------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| [`infer_provider`](_autosummary/aix.credentials.html.md#aix.credentials.infer_provider)(model_or_provider)                | Infer the provider name from a model id (or pass through a provider name).   |
 | [`provider_env_vars`](_autosummary/aix.credentials.html.md#aix.credentials.provider_env_vars)(provider)                      | Return the env-var name(s) for `provider` as a list (possibly empty).        |
 | [`resolve_api_key`](_autosummary/aix.credentials.html.md#aix.credentials.resolve_api_key)(model_or_provider, \*[, ...])    | Resolve an API key for `model_or_provider` through the documented layers.    |
 | [`check_requirements`](_autosummary/aix.credentials.html.md#aix.credentials.check_requirements)(model_or_provider, \*[, ...]) | Presence-only preflight: ensure a key for `model_or_provider` is resolvable. |
@@ -2997,6 +3003,10 @@ Security:
 
 | [`MissingCredentialError`](_autosummary/aix.credentials.html.md#aix.credentials.MissingCredentialError)(model_or_provider, \*)   | Raised when a required API key cannot be resolved.   |
 |--------------------------------------------------------------------------------------------------|------------------------------------------------------|
+
+### aix.credentials.KEYLESS_MODEL_PREFIXES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('ollama/', 'ollama_chat/')*
+
+Model-id prefixes whose provider runs locally and needs no API key (extend to add more).
 
 ### *exception* aix.credentials.MissingCredentialError(model_or_provider, , provider=None, env_names=None)
 
@@ -3040,12 +3050,15 @@ Does *not* validate the key over the network – only that one is discoverable
 via [`resolve_api_key()`](_autosummary/aix.credentials.html.md#aix.credentials.resolve_api_key) (explicit arg, env/.env, or store). Raises
 [`MissingCredentialError`](_autosummary/aix.credentials.html.md#aix.credentials.MissingCredentialError) with actionable guidance when absent.
 
-Returns `True` when a key is available.
+Returns `True` when a key is available, or when the model is local and
+needs none ([`is_keyless()`](_autosummary/aix.credentials.html.md#aix.credentials.is_keyless), e.g. `ollama/...`).
 
 ### Examples
 
 ```pycon
 >>> check_requirements("gpt-4o", api_key="sk-explicit")
+True
+>>> check_requirements("ollama/mistral")
 True
 ```
 
@@ -3073,6 +3086,20 @@ True
 
 * **Return type:**
   [`Optional`](https://docs.python.org/3/library/typing.html#typing.Optional)[[`str`](https://docs.python.org/3/builtins/stdtypes.html#str)]
+
+### aix.credentials.is_keyless(model_or_provider)
+
+True when the model is served by a local provider that needs no API key.
+
+```pycon
+>>> is_keyless("ollama/mistral:7b-instruct-q6_K")
+True
+>>> is_keyless("gpt-4o")
+False
+```
+
+* **Return type:**
+  [`bool`](https://docs.python.org/3/builtins/functions.html#bool)
 
 ### aix.credentials.provider_env_vars(provider)
 
@@ -4886,12 +4913,15 @@ Does *not* validate the key over the network – only that one is discoverable
 via [`resolve_api_key()`](_autosummary/aix.html.md#aix.resolve_api_key) (explicit arg, env/.env, or store). Raises
 [`MissingCredentialError`](_autosummary/aix.html.md#aix.MissingCredentialError) with actionable guidance when absent.
 
-Returns `True` when a key is available.
+Returns `True` when a key is available, or when the model is local and
+needs none (`is_keyless()`, e.g. `ollama/...`).
 
 ### Examples
 
 ```pycon
 >>> check_requirements("gpt-4o", api_key="sk-explicit")
+True
+>>> check_requirements("ollama/mistral")
 True
 ```
 
@@ -8075,18 +8105,18 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-22 23:13 UTC** from commit <a href="https://github.com/addaix/aix/commit/9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459"><code>9c28a45</code></a> on branch <code>master</code>, for **aix 0.0.57** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 02:34 UTC** from commit <a href="https://github.com/addaix/aix/commit/fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47"><code>fdc42c9</code></a> on branch <code>master</code>, for **aix 0.0.58** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.57) is behind the latest release on PyPI (0.0.58): `pip install aix` gives newer code than these docs describe.
+- The documented version (0.0.58) is behind the latest release on PyPI (0.0.59): `pip install aix` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459"><code>9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47"><code>fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -8097,9 +8127,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45081809401">45081809401</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45100802796">45100802796</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459</code> (in the history of the built commit) |
+| Event commit | <code>fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8124,13 +8154,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.58/">0.0.58</a>, newer than the documented version (0.0.57).
+Latest release: <a href="https://pypi.org/project/aix/0.0.59/">0.0.59</a>, newer than the documented version (0.0.58).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 9c28a45a3aedfc2f2d0d4c4bbd6363a7fb8f0459
+git checkout fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47
 pip install "epythet==0.2.23"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
