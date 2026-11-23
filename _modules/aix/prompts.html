@@ -300,6 +300,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">keyword</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">string</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_string</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">get_type_hints</span>
@@ -453,12 +454,14 @@
 <span class="sd">    'List {n} facts about {topic}'</span>
 <span class="sd">    &gt;&gt;&gt; _format_ready_template("```{kept}``` and {x:y}")</span>
 <span class="sd">    '```{{kept}}``` and {x}'</span>
+<span class="sd">    &gt;&gt;&gt; _format_ready_template("Use {{braces}} for {x}")  # escapes survive (#93)</span>
+<span class="sd">    'Use {{braces}} for {x}'</span>
 <span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_strip_specifiers</span><span class="p">(</span><span class="n">chunk</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">literal</span><span class="p">,</span> <span class="n">field_name</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_string_formatter</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">chunk</span><span class="p">):</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">literal</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_double_braces</span><span class="p">(</span><span class="n">literal</span><span class="p">))</span>  <span class="c1"># parse() returned {{ }} unescaped</span>
             <span class="k">if</span> <span class="n">field_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">out</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"{"</span> <span class="o">+</span> <span class="n">field_name</span> <span class="o">+</span> <span class="s2">"}"</span><span class="p">)</span>
         <span class="k">return</span> <span class="s2">""</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -761,17 +764,20 @@
 
     <span class="c1"># Expose the template fields to anything that reads signatures (CLI/MCP</span>
     <span class="c1"># builders, IDEs, help()): keyword-only, template order, template defaults.</span>
-    <span class="n">generated_function</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">Signature</span><span class="p">(</span>
-        <span class="p">[</span>
-            <span class="n">Parameter</span><span class="p">(</span>
-                <span class="n">param</span><span class="p">,</span>
-                <span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span>
-                <span class="n">default</span><span class="o">=</span><span class="n">template_defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">),</span>
-                <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_names</span>
-        <span class="p">]</span>
-    <span class="p">)</span>
+    <span class="c1"># A field that is not a valid parameter name ({class}, {0}, {user.name}) keeps the</span>
+    <span class="c1"># plain ``(**kwargs)`` signature, as before signatures were exposed (#93).</span>
+    <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">isidentifier</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">keyword</span><span class="o">.</span><span class="n">iskeyword</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">param_names</span><span class="p">):</span>
+        <span class="n">generated_function</span><span class="o">.</span><span class="n">__signature__</span> <span class="o">=</span> <span class="n">Signature</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="n">Parameter</span><span class="p">(</span>
+                    <span class="n">param</span><span class="p">,</span>
+                    <span class="n">Parameter</span><span class="o">.</span><span class="n">KEYWORD_ONLY</span><span class="p">,</span>
+                    <span class="n">default</span><span class="o">=</span><span class="n">template_defaults</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">Parameter</span><span class="o">.</span><span class="n">empty</span><span class="p">),</span>
+                    <span class="n">annotation</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_names</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
 
     <span class="c1"># Add metadata</span>
     <span class="n">generated_function</span><span class="o">.</span><span class="n">template</span> <span class="o">=</span> <span class="n">template</span>
@@ -1541,7 +1547,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=a08039b2"></script>
+</div><script src="../../_static/documentation_options.js?v=48a37802"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

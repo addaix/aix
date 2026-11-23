@@ -1,4 +1,4 @@
-> built 2026-11-23 22:32 UTC from cf62d3e (master) · aix 0.0.63. Details: build_info.json
+> built 2026-11-23 23:00 UTC from 1af3765 (master) · aix 0.0.64. Details: build_info.json
 
 # index.html.md
 
@@ -8319,7 +8319,7 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-23 22:32 UTC** from commit <a href="https://github.com/addaix/aix/commit/cf62d3e95bf42b0752b3fe5b27bf4710f669885d"><code>cf62d3e</code></a> on branch <code>master</code>, for **aix 0.0.63** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 23:00 UTC** from commit <a href="https://github.com/addaix/aix/commit/1af3765dd93637f6c0da70d3e269062597cc9c37"><code>1af3765</code></a> on branch <code>master</code>, for **aix 0.0.64** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -8328,7 +8328,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/cf62d3e95bf42b0752b3fe5b27bf4710f669885d"><code>cf62d3e95bf42b0752b3fe5b27bf4710f669885d</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/1af3765dd93637f6c0da70d3e269062597cc9c37"><code>1af3765dd93637f6c0da70d3e269062597cc9c37</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -8339,9 +8339,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45280201566">45280201566</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45284593335">45284593335</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>cf62d3e95bf42b0752b3fe5b27bf4710f669885d</code> (in the history of the built commit) |
+| Event commit | <code>1af3765dd93637f6c0da70d3e269062597cc9c37</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8366,13 +8366,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.63/">0.0.63</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/aix/0.0.64/">0.0.64</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout cf62d3e95bf42b0752b3fe5b27bf4710f669885d
+git checkout 1af3765dd93637f6c0da70d3e269062597cc9c37
 pip install "epythet==0.2.25"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
