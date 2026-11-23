@@ -83,3 +83,27 @@ def test_passthrough_arguments(monkeypatch):
         "args": (),
         "kwargs": {"messages": [{"role": "user", "content": "x"}]},
     }
+
+
+def test_legacy_openai_backend_warns_with_removal_version(monkeypatch):
+    """A call through the legacy backend is deprecated, naming aix.chat and the removal release."""
+    import sys
+    import types
+
+    import pytest
+
+    from aix.gen_ai import openai_genai
+    from aix.gen_ai._deprecation import REMOVAL_VERSION
+
+    if not hasattr(openai_genai, "chat"):
+        pytest.skip("oa not installed")
+    fake = types.ModuleType("oa")
+    fake.chat = lambda *a, **k: "ok"
+    monkeypatch.setitem(sys.modules, "oa", fake)
+    with pytest.warns(DeprecationWarning, match=f"removed in aix {REMOVAL_VERSION}.*aix.chat"):
+        assert openai_genai.chat("hi") == "ok"
+
+
+def test_importing_aix_emits_no_deprecation_warning(tmp_path):
+    result = _run(tmp_path, "import warnings; warnings.filterwarnings('error', message='the legacy aix.gen_ai'); import aix; print('ok')")
+    assert result.returncode == 0, result.stderr[-2000:]

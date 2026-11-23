@@ -54,7 +54,7 @@ Issues = "https://github.com/thorwhalen/aix/issues"
 Changelog = "https://github.com/thorwhalen/aix/blob/master/CHANGELOG.md"
 
 [project.optional-dependencies]
-# Provider SDKs used by the legacy aix.gen_ai backends
+# Provider SDKs used by the legacy aix.gen_ai backends: DEPRECATED, removed in 0.1.0 (use aix.chat)
 google = ["google-generativeai", "i2"]
 openai = ["oa"]
 # Model discovery from OpenRouter / Ollama / provider APIs (aix.ai_models.sources)
