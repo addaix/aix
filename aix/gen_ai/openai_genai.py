@@ -9,6 +9,8 @@ installed but no key set (https://github.com/thorwhalen/aix/issues/54).
 
 from importlib.util import find_spec
 
+from aix.gen_ai._deprecation import warn_legacy_backend
+
 name = "openai"
 required_packages = ["oa"]
 
@@ -47,7 +49,10 @@ if _oa_is_installed():
 
         Everything is passed through, so ``oa``'s own defaults (e.g. its
         configured default model) and options (``messages=``...) still apply.
+
+        Deprecated: use :func:`aix.chat`.
         """
+        warn_legacy_backend(name)
         try:
             from oa import chat as oa_chat
         except ImportError as e:

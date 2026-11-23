@@ -2,6 +2,7 @@
 
 from contextlib import suppress
 from aix.credentials import resolve_api_key
+from aix.gen_ai._deprecation import warn_legacy_backend
 
 name = "google"
 required_packages = ["google.generativeai"]
@@ -30,6 +31,7 @@ with suppress(ModuleNotFoundError, ImportError):
 
     @Sig.replace_kwargs_using(_sig)
     def chat(prompt: str, *, model="gemini-1.5-flash", **kwargs):
-        """Chat with Google's Gemini model."""
+        """Chat with Google's Gemini model (deprecated: use :func:`aix.chat`)."""
+        warn_legacy_backend(name)
         response = genai.GenerativeModel(model).generate_content(prompt)
         return response.text
