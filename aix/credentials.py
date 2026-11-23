@@ -476,6 +476,11 @@ def requires_credentials(default_model: Callable[[], Optional[str]]):
             from aix.config import resolve_model
 
             model = resolve_model(kwargs.get("model") or default_model())
+            from aix.claude_cli import check_claude_cli, is_claude_cli_model
+
+            if is_claude_cli_model(model):  # no API key: the CLI carries the login
+                check_claude_cli()
+                return func(*args, **kwargs)
             check_requirements(model, api_key=kwargs.get("api_key"))
             return func(*args, **kwargs)
 

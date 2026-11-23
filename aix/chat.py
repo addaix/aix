@@ -412,6 +412,22 @@ class Completion:
         )
 
 
+def _claude_cli_route(prompt, model, **params):
+    """The :class:`Completion` from ``claude -p`` when ``model`` is ``claude-cli/...``, else ``None``."""
+    from aix.claude_cli import (
+        claude_cli_complete,
+        is_claude_cli_model,
+        refuse_unsupported,
+    )
+    from aix.config import resolve_model
+
+    model = resolve_model(model or _get_config().chat.model)
+    if not is_claude_cli_model(model):
+        return None
+    refuse_unsupported(**params)
+    return claude_cli_complete(_normalize_prompt(prompt), model=model)
+
+
 def _require_completion():
     """Resolve litellm's ``completion`` or raise an install hint."""
     completion = _completion()
@@ -540,6 +556,11 @@ def chat(
         >>> chat(messages)  # doctest: +SKIP
         '2+2 equals 4.'
     """
+    routed = _claude_cli_route(
+        prompt, model, temperature=temperature, max_tokens=max_tokens, stream=stream
+    )
+    if routed is not None:
+        return routed.text
     completion = _require_completion()
     litellm_kwargs = _completion_kwargs(
         prompt,
@@ -681,6 +702,18 @@ def complete(
         (Verdict(label='no', confidence=0.99), 'strict')
     """
     n = int(n)  # already validated (see _validate_complete_args); np ints too
+    routed = _claude_cli_route(
+        prompt,
+        model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        n=n,
+        seed=seed,
+        response_format=response_format,
+        response_schema=response_schema,
+    )
+    if routed is not None:
+        return routed
     completion = _require_completion()
     litellm_kwargs = _completion_kwargs(
         prompt,
