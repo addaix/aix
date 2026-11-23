@@ -1,4 +1,4 @@
-> built 2026-11-23 07:25 UTC from 2859d9c (master) · aix 0.0.62. Details: build_info.json
+> built 2026-11-23 22:32 UTC from cf62d3e (master) · aix 0.0.63. Details: build_info.json
 
 # index.html.md
 
@@ -2763,9 +2763,10 @@ cost the CLI reports is on `Completion.raw["total_cost_usd"]` (see
 
 ### Notes
 
-`ANTHROPIC_API_KEY` is removed from the child environment (the CLI would
-otherwise bill that key, not the subscription); `--bare` is never used, since it skips
-the keychain read that finds the subscription login; the call runs in a neutral cwd with
+`ANTHROPIC_API_KEY` and `ANTHROPIC_AUTH_TOKEN` are removed from the child
+environment (the CLI would otherwise bill them, not the subscription); `--bare` is never used, since it skips
+the keychain read that finds the subscription login; the call runs in a fresh private
+temporary folder with
 no tools, MCP servers, slash commands or session persistence.
 
 ### Module Attributes
@@ -2775,12 +2776,12 @@ no tools, MCP servers, slash commands or session persistence.
 
 ### Functions
 
-| [`check_claude_cli`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.check_claude_cli)()                              | Raise `RuntimeError` with an install hint when `claude` is not on PATH.                                                               |
-|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| [`claude_cli_complete`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.claude_cli_complete)(messages, \*, model[, ...]) | Run `messages` through `claude -p` and return an [`aix.chat.Completion`](_autosummary/aix.html.md#aix.Completion). |
-| [`claude_cli_cost`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.claude_cli_cost)(completion)                     | The cost in USD the CLI reported for `completion` (notional on a subscription).                                                       |
-| [`is_claude_cli_model`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.is_claude_cli_model)(model)                      | Whether `model` names this backend.                                                                                                   |
-| [`refuse_unsupported`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.refuse_unsupported)(\*\*params)                  | Raise `ValueError` for any set parameter the CLI cannot honour.                                                                       |
+| [`check_claude_cli`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.check_claude_cli)()                              | Raise `RuntimeError` with an install hint when `claude` is not on PATH.                                                                                                                                            |
+|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`claude_cli_complete`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.claude_cli_complete)(messages, \*, model[, ...]) | Run `messages` through `claude -p` and return an [`aix.chat.Completion`](_autosummary/aix.html.md#aix.Completion).                                                                              |
+| [`claude_cli_cost`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.claude_cli_cost)(completion)                     | The cost in USD the CLI reported for `completion` (notional on a subscription).                                                                                                                                    |
+| [`is_claude_cli_model`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.is_claude_cli_model)(model)                      | Whether `model` names this backend.                                                                                                                                                                                |
+| [`refuse_unsupported`](_autosummary/aix.claude_cli.html.md#aix.claude_cli.refuse_unsupported)(\*\*params)                  | Raise `ValueError` for any set parameter the CLI cannot honour: the named sampling controls, an `api_key`, and any other keyword (`top_p`, `stop`, `tools`...), which would otherwise be dropped in silence (#91). |
 
 ### aix.claude_cli.UNSUPPORTED_PARAMS *= ('temperature', 'max_tokens', 'seed', 'response_format', 'response_schema')*
 
@@ -2825,7 +2826,9 @@ Whether `model` names this backend.
 
 ### aix.claude_cli.refuse_unsupported(\*\*params)
 
-Raise `ValueError` for any set parameter the CLI cannot honour.
+Raise `ValueError` for any set parameter the CLI cannot honour: the named
+sampling controls, an `api_key`, and any other keyword (`top_p`, `stop`,
+`tools`…), which would otherwise be dropped in silence (#91).
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
@@ -3173,7 +3176,7 @@ Security:
 | [`MissingCredentialError`](_autosummary/aix.credentials.html.md#aix.credentials.MissingCredentialError)(model_or_provider, \*)   | Raised when a required API key cannot be resolved.   |
 |--------------------------------------------------------------------------------------------------|------------------------------------------------------|
 
-### aix.credentials.KEYLESS_MODEL_PREFIXES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('ollama/', 'ollama_chat/')*
+### aix.credentials.KEYLESS_MODEL_PREFIXES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('ollama/', 'ollama_chat/', 'lm_studio/', 'hosted_vllm/', 'llamafile/')*
 
 Model-id prefixes whose provider runs locally and needs no API key (extend to add more).
 
@@ -3265,6 +3268,13 @@ True when the model is served by a local provider that needs no API key.
 True
 >>> is_keyless("gpt-4o")
 False
+```
+
+A bare provider name counts too (`check_requirements("ollama")`):
+
+```pycon
+>>> is_keyless("ollama"), is_keyless("lm_studio/qwen")
+(True, True)
 ```
 
 * **Return type:**
@@ -8309,18 +8319,16 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-23 07:25 UTC** from commit <a href="https://github.com/addaix/aix/commit/2859d9c4b5401df3f3e90e6bd2121a4359cd32a8"><code>2859d9c</code></a> on branch <code>master</code>, for **aix 0.0.62** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 22:32 UTC** from commit <a href="https://github.com/addaix/aix/commit/cf62d3e95bf42b0752b3fe5b27bf4710f669885d"><code>cf62d3e</code></a> on branch <code>master</code>, for **aix 0.0.63** (from <code>pyproject.toml</code>).
 
-#### WARNING
-The documentation and the package may be misaligned:
-
-- The documented version (0.0.62) is behind the latest release on PyPI (0.0.63): `pip install aix` gives newer code than these docs describe.
+#### NOTE
+Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
 
 ## Source
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/2859d9c4b5401df3f3e90e6bd2121a4359cd32a8"><code>2859d9c4b5401df3f3e90e6bd2121a4359cd32a8</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/cf62d3e95bf42b0752b3fe5b27bf4710f669885d"><code>cf62d3e95bf42b0752b3fe5b27bf4710f669885d</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -8331,15 +8339,15 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45130720190">45130720190</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45280201566">45280201566</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>2859d9c4b5401df3f3e90e6bd2121a4359cd32a8</code> (in the history of the built commit) |
+| Event commit | <code>cf62d3e95bf42b0752b3fe5b27bf4710f669885d</code> (in the history of the built commit) |
 
 ## Tools
 
 |          |         |
 |----------|---------|
-| epythet  | 0.2.24  |
+| epythet  | 0.2.25  |
 | Sphinx   | 9.1.1   |
 | docutils | 0.22.4  |
 | Python   | 3.12.16 |
@@ -8358,14 +8366,14 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.63/">0.0.63</a>, newer than the documented version (0.0.62).
+Latest release: <a href="https://pypi.org/project/aix/0.0.63/">0.0.63</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 2859d9c4b5401df3f3e90e6bd2121a4359cd32a8
-pip install "epythet==0.2.24"
+git checkout cf62d3e95bf42b0752b3fe5b27bf4710f669885d
+pip install "epythet==0.2.25"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
 

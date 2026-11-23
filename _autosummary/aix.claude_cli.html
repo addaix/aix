@@ -292,9 +292,10 @@ and <a class="reference internal" href="aix.html#aix.chat" title="aix.chat"><cod
 cost the CLI reports is on <code class="docutils literal notranslate"><span class="pre">Completion.raw[&quot;total_cost_usd&quot;]</span></code> (see
 <a class="reference internal" href="#aix.claude_cli.claude_cli_cost" title="aix.claude_cli.claude_cli_cost"><code class="xref py py-func docutils literal notranslate"><span class="pre">claude_cli_cost()</span></code></a>).</p>
 <p class="rubric">Notes</p>
-<p><code class="docutils literal notranslate"><span class="pre">ANTHROPIC_API_KEY</span></code> is removed from the child environment (the CLI would
-otherwise bill that key, not the subscription); <code class="docutils literal notranslate"><span class="pre">--bare</span></code> is never used, since it skips
-the keychain read that finds the subscription login; the call runs in a neutral cwd with
+<p><code class="docutils literal notranslate"><span class="pre">ANTHROPIC_API_KEY</span></code> and <code class="docutils literal notranslate"><span class="pre">ANTHROPIC_AUTH_TOKEN</span></code> are removed from the child
+environment (the CLI would otherwise bill them, not the subscription); <code class="docutils literal notranslate"><span class="pre">--bare</span></code> is never used, since it skips
+the keychain read that finds the subscription login; the call runs in a fresh private
+temporary folder with
 no tools, MCP servers, slash commands or session persistence.</p>
 <p class="rubric">Module Attributes</p>
 <div class="table-wrapper autosummary longtable docutils container">
@@ -323,7 +324,7 @@ no tools, MCP servers, slash commands or session persistence.</p>
 <td><p>Whether <code class="docutils literal notranslate"><span class="pre">model</span></code> names this backend.</p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#aix.claude_cli.refuse_unsupported" title="aix.claude_cli.refuse_unsupported"><code class="xref py py-obj docutils literal notranslate"><span class="pre">refuse_unsupported</span></code></a>(**params)</p></td>
-<td><p>Raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for any set parameter the CLI cannot honour.</p></td>
+<td><p>Raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for any set parameter the CLI cannot honour: the named sampling controls, an <code class="docutils literal notranslate"><span class="pre">api_key</span></code>, and any other keyword (<code class="docutils literal notranslate"><span class="pre">top_p</span></code>, <code class="docutils literal notranslate"><span class="pre">stop</span></code>, <code class="docutils literal notranslate"><span class="pre">tools</span></code>...), which would otherwise be dropped in silence (#91).</p></td>
 </tr>
 </tbody>
 </table>
@@ -390,7 +391,9 @@ no tools, MCP servers, slash commands or session persistence.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="aix.claude_cli.refuse_unsupported">
 <span class="sig-prename descclassname"><span class="pre">aix.claude_cli.</span></span><span class="sig-name descname"><span class="pre">refuse_unsupported</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">params</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aix/claude_cli.html#refuse_unsupported"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aix.claude_cli.refuse_unsupported" title="Link to this definition">¶</a></dt>
-<dd><p>Raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for any set parameter the CLI cannot honour.</p>
+<dd><p>Raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code> for any set parameter the CLI cannot honour: the named
+sampling controls, an <code class="docutils literal notranslate"><span class="pre">api_key</span></code>, and any other keyword (<code class="docutils literal notranslate"><span class="pre">top_p</span></code>, <code class="docutils literal notranslate"><span class="pre">stop</span></code>,
+<code class="docutils literal notranslate"><span class="pre">tools</span></code>…), which would otherwise be dropped in silence (#91).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
@@ -469,7 +472,7 @@ no tools, MCP servers, slash commands or session persistence.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=09c04dd4"></script>
+</div><script src="../_static/documentation_options.js?v=a08039b2"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

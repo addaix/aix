@@ -19,9 +19,10 @@ cost the CLI reports is on `Completion.raw["total_cost_usd"]` (see
 
 ### Notes
 
-`ANTHROPIC_API_KEY` is removed from the child environment (the CLI would
-otherwise bill that key, not the subscription); `--bare` is never used, since it skips
-the keychain read that finds the subscription login; the call runs in a neutral cwd with
+`ANTHROPIC_API_KEY` and `ANTHROPIC_AUTH_TOKEN` are removed from the child
+environment (the CLI would otherwise bill them, not the subscription); `--bare` is never used, since it skips
+the keychain read that finds the subscription login; the call runs in a fresh private
+temporary folder with
 no tools, MCP servers, slash commands or session persistence.
 
 ### Module Attributes
@@ -31,12 +32,12 @@ no tools, MCP servers, slash commands or session persistence.
 
 ### Functions
 
-| [`check_claude_cli`](#aix.claude_cli.check_claude_cli)()                              | Raise `RuntimeError` with an install hint when `claude` is not on PATH.                                                               |
-|--------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------|
-| [`claude_cli_complete`](#aix.claude_cli.claude_cli_complete)(messages, \*, model[, ...]) | Run `messages` through `claude -p` and return an [`aix.chat.Completion`](aix.html.md#aix.Completion). |
-| [`claude_cli_cost`](#aix.claude_cli.claude_cli_cost)(completion)                     | The cost in USD the CLI reported for `completion` (notional on a subscription).                                                       |
-| [`is_claude_cli_model`](#aix.claude_cli.is_claude_cli_model)(model)                      | Whether `model` names this backend.                                                                                                   |
-| [`refuse_unsupported`](#aix.claude_cli.refuse_unsupported)(\*\*params)                  | Raise `ValueError` for any set parameter the CLI cannot honour.                                                                       |
+| [`check_claude_cli`](#aix.claude_cli.check_claude_cli)()                              | Raise `RuntimeError` with an install hint when `claude` is not on PATH.                                                                                                                                            |
+|--------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`claude_cli_complete`](#aix.claude_cli.claude_cli_complete)(messages, \*, model[, ...]) | Run `messages` through `claude -p` and return an [`aix.chat.Completion`](aix.html.md#aix.Completion).                                                                              |
+| [`claude_cli_cost`](#aix.claude_cli.claude_cli_cost)(completion)                     | The cost in USD the CLI reported for `completion` (notional on a subscription).                                                                                                                                    |
+| [`is_claude_cli_model`](#aix.claude_cli.is_claude_cli_model)(model)                      | Whether `model` names this backend.                                                                                                                                                                                |
+| [`refuse_unsupported`](#aix.claude_cli.refuse_unsupported)(\*\*params)                  | Raise `ValueError` for any set parameter the CLI cannot honour: the named sampling controls, an `api_key`, and any other keyword (`top_p`, `stop`, `tools`...), which would otherwise be dropped in silence (#91). |
 
 ### aix.claude_cli.UNSUPPORTED_PARAMS *= ('temperature', 'max_tokens', 'seed', 'response_format', 'response_schema')*
 
@@ -81,7 +82,9 @@ Whether `model` names this backend.
 
 ### aix.claude_cli.refuse_unsupported(\*\*params)
 
-Raise `ValueError` for any set parameter the CLI cannot honour.
+Raise `ValueError` for any set parameter the CLI cannot honour: the named
+sampling controls, an `api_key`, and any other keyword (`top_p`, `stop`,
+`tools`…), which would otherwise be dropped in silence (#91).
 
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)

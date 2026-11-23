@@ -68,7 +68,7 @@ Security:
 | [`MissingCredentialError`](#aix.credentials.MissingCredentialError)(model_or_provider, \*)   | Raised when a required API key cannot be resolved.   |
 |--------------------------------------------------------------------------------------------------|------------------------------------------------------|
 
-### aix.credentials.KEYLESS_MODEL_PREFIXES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('ollama/', 'ollama_chat/')*
+### aix.credentials.KEYLESS_MODEL_PREFIXES *: [tuple](https://docs.python.org/3/builtins/stdtypes.html#tuple)[[str](https://docs.python.org/3/builtins/stdtypes.html#str), ...]* *= ('ollama/', 'ollama_chat/', 'lm_studio/', 'hosted_vllm/', 'llamafile/')*
 
 Model-id prefixes whose provider runs locally and needs no API key (extend to add more).
 
@@ -160,6 +160,13 @@ True when the model is served by a local provider that needs no API key.
 True
 >>> is_keyless("gpt-4o")
 False
+```
+
+A bare provider name counts too (`check_requirements("ollama")`):
+
+```pycon
+>>> is_keyless("ollama"), is_keyless("lm_studio/qwen")
+(True, True)
 ```
 
 * **Return type:**
