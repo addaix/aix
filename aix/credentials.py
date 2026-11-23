@@ -53,6 +53,8 @@ __all__ = [
     "PROVIDER_ENV_VARS",
     "PROVIDER_CONSOLE_URLS",
     "MODEL_PREFIX_PROVIDERS",
+    "KEYLESS_MODEL_PREFIXES",
+    "is_keyless",
     "MissingCredentialError",
     "infer_provider",
     "provider_env_vars",
@@ -152,6 +154,23 @@ MODEL_PREFIX_PROVIDERS: dict[str, str] = {
     "deepseek-": "deepseek",
     "grok-": "xai",
 }
+
+
+#: Model-id prefixes whose provider runs locally and needs no API key (extend to add more).
+KEYLESS_MODEL_PREFIXES: tuple[str, ...] = ("ollama/", "ollama_chat/")
+
+
+def is_keyless(model_or_provider: Optional[str]) -> bool:
+    """True when the model is served by a local provider that needs no API key.
+
+    >>> is_keyless("ollama/mistral:7b-instruct-q6_K")
+    True
+    >>> is_keyless("gpt-4o")
+    False
+    """
+    return bool(model_or_provider) and model_or_provider.startswith(
+        KEYLESS_MODEL_PREFIXES
+    )
 
 
 def _infer_provider_from_prefix(model: str) -> Optional[str]:
@@ -411,12 +430,17 @@ def check_requirements(
     via :func:`resolve_api_key` (explicit arg, env/.env, or store). Raises
     :class:`MissingCredentialError` with actionable guidance when absent.
 
-    Returns ``True`` when a key is available.
+    Returns ``True`` when a key is available, or when the model is local and
+    needs none (:func:`is_keyless`, e.g. ``ollama/...``).
 
     Examples:
         >>> check_requirements("gpt-4o", api_key="sk-explicit")
         True
+        >>> check_requirements("ollama/mistral")
+        True
     """
+    if is_keyless(model_or_provider):
+        return True
     if resolve_api_key(model_or_provider, api_key=api_key) is not None:
         return True
     raise MissingCredentialError(model_or_provider)
