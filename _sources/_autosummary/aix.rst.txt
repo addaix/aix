@@ -14,6 +14,9 @@
       using
       load_config
       resolve_model
+      call_logger
+      set_call_logger
+      jsonl_logger
       resolve_api_key
       check_requirements
       check_keys
@@ -59,6 +62,7 @@
    .. autosummary::
    
       AixConfig
+      CallRecord
       Completion
       Usage
       Sample
@@ -96,6 +100,7 @@
    ai_models
    audio
    batches
+   calllog
    capabilities
    claude_cli
    credentials

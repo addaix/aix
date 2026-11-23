@@ -13,6 +13,7 @@
 - [aix.ai_models.sources](aix.ai_models.sources.html.md): Concrete implementations of model sources and connectors.
 - [aix.audio](aix.audio.html.md): Audio operations interface for AIX.
 - [aix.batches](aix.batches.html.md): Batch processing interface for AIX.
+- [aix.calllog](aix.calllog.html.md): An opt-in log of aix model calls: the resolved model, the caller, the outcome.
 - [aix.capabilities](aix.capabilities.html.md): What a model supports, asked before calling it.
 - [aix.claude_cli](aix.claude_cli.html.md): A chat backend that runs prompts through the Claude Code CLI (&#96;claude -p&#96;).
 - [aix.credentials](aix.credentials.html.md): Unified, discoverable API-key / secret resolution for AIX.

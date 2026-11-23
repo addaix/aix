@@ -1,0 +1,26 @@
+aix.calllog
+===========
+
+.. automodule:: aix.calllog
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      ENV_VAR
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      set_call_logger
+      call_logger
+      jsonl_logger
+   
+   .. rubric:: Classes
+
+   .. autosummary::
+   
+      CallRecord
+   

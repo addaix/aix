@@ -214,6 +214,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="aix.audio.html">aix.audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aix.batches.html">aix.batches</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aix.calllog.html">aix.calllog</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aix.capabilities.html">aix.capabilities</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aix.claude_cli.html">aix.claude_cli</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aix.credentials.html">aix.credentials</a></li>
@@ -357,121 +358,130 @@ provider-specific details and complexities.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="#aix.resolve_model" title="aix.resolve_model"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_model</span></code></a>(model, *[, config])</p></td>
 <td><p>Resolve a semantic alias (<code class="docutils literal notranslate"><span class="pre">&quot;fast&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;best&quot;</span></code>, ...) to a concrete model id.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.resolve_api_key" title="aix.resolve_api_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_api_key</span></code></a>(model_or_provider, *[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.call_logger" title="aix.call_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">call_logger</span></code></a>(logger)</p></td>
+<td><p>Log calls made inside the <code class="docutils literal notranslate"><span class="pre">with</span></code> block to <code class="docutils literal notranslate"><span class="pre">logger</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.set_call_logger" title="aix.set_call_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">set_call_logger</span></code></a>(logger)</p></td>
+<td><p>Install <code class="docutils literal notranslate"><span class="pre">logger</span></code> for this context (<code class="docutils literal notranslate"><span class="pre">None</span></code> turns logging off).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.jsonl_logger" title="aix.jsonl_logger"><code class="xref py py-obj docutils literal notranslate"><span class="pre">jsonl_logger</span></code></a>(path)</p></td>
+<td><p>A logger that appends one JSON line per call to <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.resolve_api_key" title="aix.resolve_api_key"><code class="xref py py-obj docutils literal notranslate"><span class="pre">resolve_api_key</span></code></a>(model_or_provider, *[, ...])</p></td>
 <td><p>Resolve an API key for <code class="docutils literal notranslate"><span class="pre">model_or_provider</span></code> through the documented layers.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.check_requirements" title="aix.check_requirements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_requirements</span></code></a>(model_or_provider, *[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.check_requirements" title="aix.check_requirements"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_requirements</span></code></a>(model_or_provider, *[, ...])</p></td>
 <td><p>Presence-only preflight: ensure a key for <code class="docutils literal notranslate"><span class="pre">model_or_provider</span></code> is resolvable.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.check_keys" title="aix.check_keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_keys</span></code></a>([providers])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.check_keys" title="aix.check_keys"><code class="xref py py-obj docutils literal notranslate"><span class="pre">check_keys</span></code></a>([providers])</p></td>
 <td><p>Report, per provider, whether a usable API key is discoverable.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.chat" title="aix.chat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chat</span></code></a>(prompt, *[, model, temperature, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.chat" title="aix.chat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chat</span></code></a>(prompt, *[, model, temperature, ...])</p></td>
 <td><p>Send a chat prompt and get a response.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.complete" title="aix.complete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">complete</span></code></a>(prompt, *[, model, temperature, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.complete" title="aix.complete"><code class="xref py py-obj docutils literal notranslate"><span class="pre">complete</span></code></a>(prompt, *[, model, temperature, ...])</p></td>
 <td><p>Send a chat prompt and get the whole response back as a <a class="reference internal" href="#aix.Completion" title="aix.Completion"><code class="xref py py-class docutils literal notranslate"><span class="pre">Completion</span></code></a>.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.ask" title="aix.ask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ask</span></code></a>(question[, model])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.ask" title="aix.ask"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ask</span></code></a>(question[, model])</p></td>
 <td><p>Ask a single question and get an answer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.sample" title="aix.sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample</span></code></a>(prompt, *, n[, temperature, seed, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.sample" title="aix.sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sample</span></code></a>(prompt, *, n[, temperature, seed, ...])</p></td>
 <td><p>Draw <code class="docutils literal notranslate"><span class="pre">n</span></code> answers to <code class="docutils literal notranslate"><span class="pre">prompt</span></code>, each with its finish reason and usage.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.supports" title="aix.supports"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supports</span></code></a>(model, param)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.supports" title="aix.supports"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supports</span></code></a>(model, param)</p></td>
 <td><p>Whether <code class="docutils literal notranslate"><span class="pre">model</span></code> is known to accept <code class="docutils literal notranslate"><span class="pre">param</span></code> -- i.e. whether LiteLLM <em>forwards</em> it to the provider for this model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.supported_params" title="aix.supported_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supported_params</span></code></a>([model])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.supported_params" title="aix.supported_params"><code class="xref py py-obj docutils literal notranslate"><span class="pre">supported_params</span></code></a>([model])</p></td>
 <td><p>The OpenAI-style parameters LiteLLM says <code class="docutils literal notranslate"><span class="pre">model</span></code> accepts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.chat_with_history" title="aix.chat_with_history"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chat_with_history</span></code></a>([system_prompt, model])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.chat_with_history" title="aix.chat_with_history"><code class="xref py py-obj docutils literal notranslate"><span class="pre">chat_with_history</span></code></a>([system_prompt, model])</p></td>
 <td><p>Create a stateful chat session that maintains conversation history.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.embeddings" title="aix.embeddings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">embeddings</span></code></a>(segments, *[, model, api_key])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.embeddings" title="aix.embeddings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">embeddings</span></code></a>(segments, *[, model, api_key])</p></td>
 <td><p>Generate embeddings for multiple text segments.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.embed" title="aix.embed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">embed</span></code></a>(text, *[, model])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.embed" title="aix.embed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">embed</span></code></a>(text, *[, model])</p></td>
 <td><p>Generate embedding for a single text.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.cosine_similarity" title="aix.cosine_similarity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cosine_similarity</span></code></a>(vec1, vec2)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.cosine_similarity" title="aix.cosine_similarity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">cosine_similarity</span></code></a>(vec1, vec2)</p></td>
 <td><p>Compute cosine similarity between two vectors.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.find_most_similar" title="aix.find_most_similar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_most_similar</span></code></a>(query, candidates, *[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.find_most_similar" title="aix.find_most_similar"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_most_similar</span></code></a>(query, candidates, *[, ...])</p></td>
 <td><p>Find most similar texts to a query.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.prompt_func" title="aix.prompt_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompt_func</span></code></a>(template, *[, output_schema, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.prompt_func" title="aix.prompt_func"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompt_func</span></code></a>(template, *[, output_schema, ...])</p></td>
 <td><p>Create a callable function from a prompt template.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.prompt_to_text" title="aix.prompt_to_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompt_to_text</span></code></a>(template, **kwargs)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.prompt_to_text" title="aix.prompt_to_text"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompt_to_text</span></code></a>(template, **kwargs)</p></td>
 <td><p>Create a function that returns text output.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.prompt_to_json" title="aix.prompt_to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompt_to_json</span></code></a>(template, schema, **kwargs)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.prompt_to_json" title="aix.prompt_to_json"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompt_to_json</span></code></a>(template, schema, **kwargs)</p></td>
 <td><p>Create a function that returns structured JSON output.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.constrained_answer" title="aix.constrained_answer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">constrained_answer</span></code></a>(prompt, valid_answers, *)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.constrained_answer" title="aix.constrained_answer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">constrained_answer</span></code></a>(prompt, valid_answers, *)</p></td>
 <td><p>Get an answer from the LLM constrained to a set of valid answers or types.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.discover_available_models" title="aix.discover_available_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">discover_available_models</span></code></a>([source, verbose])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.discover_available_models" title="aix.discover_available_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">discover_available_models</span></code></a>([source, verbose])</p></td>
 <td><p>Discover available models from a source.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.get_model_info" title="aix.get_model_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model_info</span></code></a>(model_id)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.get_model_info" title="aix.get_model_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_model_info</span></code></a>(model_id)</p></td>
 <td><p>Get information about a specific model.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.find_models" title="aix.find_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_models</span></code></a>(query)</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.find_models" title="aix.find_models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">find_models</span></code></a>(query)</p></td>
 <td><p>Search for models matching a query.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.batch_chat" title="aix.batch_chat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_chat</span></code></a>(prompts, *[, model, batch_size, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.batch_chat" title="aix.batch_chat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_chat</span></code></a>(prompts, *[, model, batch_size, ...])</p></td>
 <td><p>Process multiple chat prompts in batches.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.batch_embeddings" title="aix.batch_embeddings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_embeddings</span></code></a>(segments, *[, model, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.batch_embeddings" title="aix.batch_embeddings"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_embeddings</span></code></a>(segments, *[, model, ...])</p></td>
 <td><p>Generate embeddings for multiple texts in batches.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.batch_process" title="aix.batch_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_process</span></code></a>(items, process_func, *[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.batch_process" title="aix.batch_process"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batch_process</span></code></a>(items, process_func, *[, ...])</p></td>
 <td><p>Generic batch processing with parallel execution and retries.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.generate_image" title="aix.generate_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_image</span></code></a>(prompt, *[, model, size, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.generate_image" title="aix.generate_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_image</span></code></a>(prompt, *[, model, size, ...])</p></td>
 <td><p>Generate a single image from a text prompt.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.generate_images" title="aix.generate_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_images</span></code></a>(prompt, *[, n, model, size, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.generate_images" title="aix.generate_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_images</span></code></a>(prompt, *[, n, model, size, ...])</p></td>
 <td><p>Generate multiple images from a text prompt.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.edit_image" title="aix.edit_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edit_image</span></code></a>(image_path, prompt, *[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.edit_image" title="aix.edit_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edit_image</span></code></a>(image_path, prompt, *[, ...])</p></td>
 <td><p>Edit an existing image based on a prompt.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.create_variation" title="aix.create_variation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_variation</span></code></a>(image_path, *[, model, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.create_variation" title="aix.create_variation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">create_variation</span></code></a>(image_path, *[, model, ...])</p></td>
 <td><p>Create variations of an existing image.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.text_to_speech" title="aix.text_to_speech"><code class="xref py py-obj docutils literal notranslate"><span class="pre">text_to_speech</span></code></a>(text, *[, model, voice, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.text_to_speech" title="aix.text_to_speech"><code class="xref py py-obj docutils literal notranslate"><span class="pre">text_to_speech</span></code></a>(text, *[, model, voice, ...])</p></td>
 <td><p>Convert text to speech audio.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.transcribe" title="aix.transcribe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transcribe</span></code></a>(audio, *[, engine, model, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.transcribe" title="aix.transcribe"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transcribe</span></code></a>(audio, *[, engine, model, ...])</p></td>
 <td><p>Transcribe audio to text.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.transcribe_with_timestamps" title="aix.transcribe_with_timestamps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transcribe_with_timestamps</span></code></a>(audio, *[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.transcribe_with_timestamps" title="aix.transcribe_with_timestamps"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transcribe_with_timestamps</span></code></a>(audio, *[, ...])</p></td>
 <td><p>Transcribe audio with detailed timestamps.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.translate_audio" title="aix.translate_audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate_audio</span></code></a>(audio, *[, model, prompt, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.translate_audio" title="aix.translate_audio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">translate_audio</span></code></a>(audio, *[, model, prompt, ...])</p></td>
 <td><p>Translate audio from any language to English.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.generate_video" title="aix.generate_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_video</span></code></a>(prompt, *[, model, duration, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.generate_video" title="aix.generate_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">generate_video</span></code></a>(prompt, *[, model, duration, ...])</p></td>
 <td><p>Generate a video from a text prompt.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.animate_image_to_video" title="aix.animate_image_to_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">animate_image_to_video</span></code></a>(image_path[, prompt, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.animate_image_to_video" title="aix.animate_image_to_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">animate_image_to_video</span></code></a>(image_path[, prompt, ...])</p></td>
 <td><p>Animate a static image into a video.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.extend_video" title="aix.extend_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend_video</span></code></a>(video_path[, prompt, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.extend_video" title="aix.extend_video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">extend_video</span></code></a>(video_path[, prompt, ...])</p></td>
 <td><p>Extend an existing video with additional generated content.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.get_video_providers" title="aix.get_video_providers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_video_providers</span></code></a>()</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.get_video_providers" title="aix.get_video_providers"><code class="xref py py-obj docutils literal notranslate"><span class="pre">get_video_providers</span></code></a>()</p></td>
 <td><p>Get list of available video generation providers.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.describe_image" title="aix.describe_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describe_image</span></code></a>(image, *[, prompt, model, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.describe_image" title="aix.describe_image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">describe_image</span></code></a>(image, *[, prompt, model, ...])</p></td>
 <td><p>Describe (or answer a question about) <code class="docutils literal notranslate"><span class="pre">image</span></code> and return the text.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.to_image_content" title="aix.to_image_content"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_image_content</span></code></a>(image, *[, detail])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.to_image_content" title="aix.to_image_content"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_image_content</span></code></a>(image, *[, detail])</p></td>
 <td><p>Build a multimodal <code class="docutils literal notranslate"><span class="pre">image_url</span></code> content block for <code class="docutils literal notranslate"><span class="pre">image</span></code>.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.compare_images" title="aix.compare_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare_images</span></code></a>(candidate, reference, *[, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.compare_images" title="aix.compare_images"><code class="xref py py-obj docutils literal notranslate"><span class="pre">compare_images</span></code></a>(candidate, reference, *[, ...])</p></td>
 <td><p>Compare a <code class="docutils literal notranslate"><span class="pre">candidate</span></code> image to <code class="docutils literal notranslate"><span class="pre">reference</span></code> image(s) on a rubric.</p></td>
 </tr>
 </tbody>
@@ -484,55 +494,58 @@ provider-specific details and complexities.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#aix.AixConfig" title="aix.AixConfig"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AixConfig</span></code></a>([chat, embeddings, image, audio, ...])</p></td>
 <td><p>Top-level AIX configuration (single source of truth for defaults).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.Completion" title="aix.Completion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Completion</span></code></a>(texts[, finish_reasons, usage, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.CallRecord" title="aix.CallRecord"><code class="xref py py-obj docutils literal notranslate"><span class="pre">CallRecord</span></code></a>(function, model, caller, ok, seconds)</p></td>
+<td><p>One aix call: which function, the model it resolved to, who called, how it ended.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.Completion" title="aix.Completion"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Completion</span></code></a>(texts[, finish_reasons, usage, ...])</p></td>
 <td><p>Everything a chat completion returned, not just the first text.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.Usage" title="aix.Usage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Usage</span></code></a>([prompt_tokens, completion_tokens, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.Usage" title="aix.Usage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Usage</span></code></a>([prompt_tokens, completion_tokens, ...])</p></td>
 <td><p>Token counts billed for one call (or summed over several).</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.Sample" title="aix.Sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sample</span></code></a>(text, payload[, finish_reason, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.Sample" title="aix.Sample"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Sample</span></code></a>(text, payload[, finish_reason, ...])</p></td>
 <td><p>One drawn answer.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.Samples" title="aix.Samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Samples</span></code></a>([samples, usage, n_requests, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.Samples" title="aix.Samples"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Samples</span></code></a>([samples, usage, n_requests, ...])</p></td>
 <td><p>The list of <a class="reference internal" href="#aix.Sample" title="aix.Sample"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sample</span></code></a> returned by <a class="reference internal" href="#aix.sample" title="aix.sample"><code class="xref py py-func docutils literal notranslate"><span class="pre">sample()</span></code></a>, plus batch facts.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.ResponseSchema" title="aix.ResponseSchema"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResponseSchema</span></code></a>(name, json_schema, ...[, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.ResponseSchema" title="aix.ResponseSchema"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ResponseSchema</span></code></a>(name, json_schema, ...[, ...])</p></td>
 <td><p>A normalized response schema: its JSON Schema, name, and validator.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.ChatSession" title="aix.ChatSession"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChatSession</span></code></a>([system_prompt, model])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.ChatSession" title="aix.ChatSession"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ChatSession</span></code></a>([system_prompt, model])</p></td>
 <td><p>Stateful chat session that maintains conversation history.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.EmbeddingCache" title="aix.EmbeddingCache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EmbeddingCache</span></code></a>([model])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.EmbeddingCache" title="aix.EmbeddingCache"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EmbeddingCache</span></code></a>([model])</p></td>
 <td><p>Cache for embeddings to avoid redundant API calls.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.PromptFuncs" title="aix.PromptFuncs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PromptFuncs</span></code></a>([model])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.PromptFuncs" title="aix.PromptFuncs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">PromptFuncs</span></code></a>([model])</p></td>
 <td><p>Collection of prompt-based functions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.ModelStore" title="aix.ModelStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModelStore</span></code></a>([storage_path, auto_discover])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.ModelStore" title="aix.ModelStore"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ModelStore</span></code></a>([storage_path, auto_discover])</p></td>
 <td><p>User-friendly interface for model discovery and selection.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.BatchProcessor" title="aix.BatchProcessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BatchProcessor</span></code></a>(*[, batch_size, max_workers, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.BatchProcessor" title="aix.BatchProcessor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BatchProcessor</span></code></a>(*[, batch_size, max_workers, ...])</p></td>
 <td><p>Stateful batch processor for managing long-running operations.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.BatchError" title="aix.BatchError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BatchError</span></code></a>(exception, *[, index, message])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.BatchError" title="aix.BatchError"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BatchError</span></code></a>(exception, *[, index, message])</p></td>
 <td><p>A batch result slot standing in for an item that raised.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.GeneratedImage" title="aix.GeneratedImage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneratedImage</span></code></a>([url, b64_json, model, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.GeneratedImage" title="aix.GeneratedImage"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneratedImage</span></code></a>([url, b64_json, model, ...])</p></td>
 <td><p>Wrapper for generated images.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.GeneratedAudio" title="aix.GeneratedAudio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneratedAudio</span></code></a>(data[, model, text, voice, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.GeneratedAudio" title="aix.GeneratedAudio"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneratedAudio</span></code></a>(data[, model, text, voice, ...])</p></td>
 <td><p>Wrapper for generated audio.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.TranscriptionResult" title="aix.TranscriptionResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TranscriptionResult</span></code></a>(text[, language, ...])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.TranscriptionResult" title="aix.TranscriptionResult"><code class="xref py py-obj docutils literal notranslate"><span class="pre">TranscriptionResult</span></code></a>(text[, language, ...])</p></td>
 <td><p>Result of audio transcription.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.GeneratedVideo" title="aix.GeneratedVideo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneratedVideo</span></code></a>([url, data, model, prompt, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.GeneratedVideo" title="aix.GeneratedVideo"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GeneratedVideo</span></code></a>([url, data, model, prompt, ...])</p></td>
 <td><p>Wrapper for generated videos.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#aix.RubricVerdict" title="aix.RubricVerdict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RubricVerdict</span></code></a>(aspect, match, confidence[, note])</p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="#aix.RubricVerdict" title="aix.RubricVerdict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RubricVerdict</span></code></a>(aspect, match, confidence[, note])</p></td>
 <td><p>A vision model's verdict on a single rubric aspect.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#aix.ImageComparison" title="aix.ImageComparison"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImageComparison</span></code></a>(match, confidence, explanation)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#aix.ImageComparison" title="aix.ImageComparison"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ImageComparison</span></code></a>(match, confidence, explanation)</p></td>
 <td><p>Structured result of comparing a candidate image to reference(s).</p></td>
 </tr>
 </tbody>
@@ -692,6 +705,15 @@ progress tracking, error handling, and result caching.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="aix.CallRecord">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">aix.</span></span><span class="sig-name descname"><span class="pre">CallRecord</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">caller</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ok</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seconds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aix/calllog.html#CallRecord"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aix.CallRecord" title="Link to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/builtins/functions.html#object" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>One aix call: which function, the model it resolved to, who called, how it ended.</p>
+<dl class="field-list simple">
+</dl>
 </dd></dl>
 
 <dl class="py class">
@@ -2374,6 +2396,17 @@ carrying the original exception on <code class="code docutils literal notranslat
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="aix.call_logger">
+<span class="sig-prename descclassname"><span class="pre">aix.</span></span><span class="sig-name descname"><span class="pre">call_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aix/calllog.html#call_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aix.call_logger" title="Link to this definition">¶</a></dt>
+<dd><p>Log calls made inside the <code class="docutils literal notranslate"><span class="pre">with</span></code> block to <code class="docutils literal notranslate"><span class="pre">logger</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Iterator</span></code></a>[<span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="aix.chat">
 <span class="sig-prename descclassname"><span class="pre">aix.</span></span><span class="sig-name descname"><span class="pre">chat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">prompt</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_tokens</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stream</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aix/chat.html#chat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aix.chat" title="Link to this definition">¶</a></dt>
 <dd><p>Send a chat prompt and get a response.</p>
@@ -2393,6 +2426,8 @@ If None, uses default (1.0).</p></li>
 complete response as string.</p></li>
 <li><p><strong>api_key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Explicit API key. If None, resolved from the environment / .env
 / AIX config store for the model’s provider (see aix.credentials).</p></li>
+<li><p><strong>on_call</strong> – Optional <code class="docutils literal notranslate"><span class="pre">fn(CallRecord)</span></code> called after the call with the resolved
+model, the caller and the outcome (opt-in call log, see <a class="reference internal" href="aix.calllog.html#module-aix.calllog" title="aix.calllog"><code class="xref py py-mod docutils literal notranslate"><span class="pre">aix.calllog</span></code></a>).</p></li>
 <li><p><strong>**kwargs</strong> – Additional provider-specific parameters passed to LiteLLM</p></li>
 </ul>
 </dd>
@@ -3378,6 +3413,17 @@ asyncio task; otherwise the process-wide config.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="aix.jsonl_logger">
+<span class="sig-prename descclassname"><span class="pre">aix.</span></span><span class="sig-name descname"><span class="pre">jsonl_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aix/calllog.html#jsonl_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aix.jsonl_logger" title="Link to this definition">¶</a></dt>
+<dd><p>A logger that appends one JSON line per call to <code class="docutils literal notranslate"><span class="pre">path</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.15)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference internal" href="aix.calllog.html#aix.calllog.CallRecord" title="aix.calllog.CallRecord"><code class="xref py py-class docutils literal notranslate"><span class="pre">CallRecord</span></code></a>], <span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="aix.load_config">
 <span class="sig-prename descclassname"><span class="pre">aix.</span></span><span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">environ</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aix/config.html#load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aix.load_config" title="Link to this definition">¶</a></dt>
 <dd><p>Resolve an <a class="reference internal" href="#aix.AixConfig" title="aix.AixConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">AixConfig</span></code></a> from shipped defaults, TOML file, and env.</p>
@@ -3685,6 +3731,17 @@ that sample’s <code class="docutils literal notranslate"><span class="pre">err
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="aix.set_call_logger">
+<span class="sig-prename descclassname"><span class="pre">aix.</span></span><span class="sig-name descname"><span class="pre">set_call_logger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aix/calllog.html#set_call_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aix.set_call_logger" title="Link to this definition">¶</a></dt>
+<dd><p>Install <code class="docutils literal notranslate"><span class="pre">logger</span></code> for this context (<code class="docutils literal notranslate"><span class="pre">None</span></code> turns logging off).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><span class="highlight sphinx_autodoc_typehints-value"><a class="reference external" href="https://docs.python.org/3/builtins/constants.html#None" title="(in Python v3.15)"><code class="xref py py-obj docutils literal notranslate"><span class="kc"><span class="pre">None</span></span></code></a></span></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="aix.set_config">
 <span class="sig-prename descclassname"><span class="pre">aix.</span></span><span class="sig-name descname"><span class="pre">set_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/aix/config.html#set_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#aix.set_config" title="Link to this definition">¶</a></dt>
 <dd><p>Replace the active config wholesale. Returns the new active config.</p>
@@ -3981,46 +4038,49 @@ block keeps the scope for its lifetime.</p>
 <tr class="row-even"><td><p><a class="reference internal" href="aix.batches.html#module-aix.batches" title="aix.batches"><code class="xref py py-obj docutils literal notranslate"><span class="pre">batches</span></code></a></p></td>
 <td><p>Batch processing interface for AIX.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.capabilities.html#module-aix.capabilities" title="aix.capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capabilities</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.calllog.html#module-aix.calllog" title="aix.calllog"><code class="xref py py-obj docutils literal notranslate"><span class="pre">calllog</span></code></a></p></td>
+<td><p>An opt-in log of aix model calls: the resolved model, the caller, the outcome.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.capabilities.html#module-aix.capabilities" title="aix.capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capabilities</span></code></a></p></td>
 <td><p>What a model supports, asked before calling it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.claude_cli.html#module-aix.claude_cli" title="aix.claude_cli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">claude_cli</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.claude_cli.html#module-aix.claude_cli" title="aix.claude_cli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">claude_cli</span></code></a></p></td>
 <td><p>A chat backend that runs prompts through the Claude Code CLI (<code class="docutils literal notranslate"><span class="pre">claude</span> <span class="pre">-p</span></code>).</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.credentials.html#module-aix.credentials" title="aix.credentials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">credentials</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.credentials.html#module-aix.credentials" title="aix.credentials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">credentials</span></code></a></p></td>
 <td><p>Unified, discoverable API-key / secret resolution for AIX.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.gen_ai.html#module-aix.gen_ai" title="aix.gen_ai"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_ai</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.gen_ai.html#module-aix.gen_ai" title="aix.gen_ai"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_ai</span></code></a></p></td>
 <td><p>Generative AI modules.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.image.html#module-aix.image" title="aix.image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">image</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.image.html#module-aix.image" title="aix.image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">image</span></code></a></p></td>
 <td><p>Image generation interface for AIX.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.misc.html#module-aix.misc" title="aix.misc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">misc</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.misc.html#module-aix.misc" title="aix.misc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">misc</span></code></a></p></td>
 <td><p>Misc AIX functions.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.models.html#aix.models" title="aix.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.models.html#aix.models" title="aix.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a></p></td>
 <td><p>User-friendly interface for model discovery and selection.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.prompts.html#module-aix.prompts" title="aix.prompts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompts</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.prompts.html#module-aix.prompts" title="aix.prompts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompts</span></code></a></p></td>
 <td><p>Prompt-based function creation for AIX.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.sampling.html#module-aix.sampling" title="aix.sampling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sampling</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.sampling.html#module-aix.sampling" title="aix.sampling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sampling</span></code></a></p></td>
 <td><p>Repeated sampling: <code class="docutils literal notranslate"><span class="pre">n</span></code> answers to one prompt, drawn as fast as the provider allows.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.stores.html#module-aix.stores" title="aix.stores"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stores</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.stores.html#module-aix.stores" title="aix.stores"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stores</span></code></a></p></td>
 <td><p>Storage layers for AIX.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.structured.html#module-aix.structured" title="aix.structured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">structured</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.structured.html#module-aix.structured" title="aix.structured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">structured</span></code></a></p></td>
 <td><p>Structured output: a schema in, validated values out, enforced as far as the provider allows.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.util.html#module-aix.util" title="aix.util"><code class="xref py py-obj docutils literal notranslate"><span class="pre">util</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.util.html#module-aix.util" title="aix.util"><code class="xref py py-obj docutils literal notranslate"><span class="pre">util</span></code></a></p></td>
 <td><p>Utils for AIX.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.video.html#module-aix.video" title="aix.video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">video</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.video.html#module-aix.video" title="aix.video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">video</span></code></a></p></td>
 <td><p>Video generation interface for AIX.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.vision.html#module-aix.vision" title="aix.vision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vision</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.vision.html#module-aix.vision" title="aix.vision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vision</span></code></a></p></td>
 <td><p>Image-to-text (vision) interface for AIX.</p></td>
 </tr>
 </tbody>
@@ -4093,6 +4153,7 @@ block keeps the scope for its lifetime.</p>
 <li><a class="reference internal" href="#aix.BatchProcessor.save_results"><code class="docutils literal notranslate"><span class="pre">BatchProcessor.save_results()</span></code></a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#aix.CallRecord"><code class="docutils literal notranslate"><span class="pre">CallRecord</span></code></a></li>
 <li><a class="reference internal" href="#aix.ChatSession"><code class="docutils literal notranslate"><span class="pre">ChatSession</span></code></a><ul>
 <li><a class="reference internal" href="#aix.ChatSession.clear_history"><code class="docutils literal notranslate"><span class="pre">ChatSession.clear_history()</span></code></a></li>
 <li><a class="reference internal" href="#aix.ChatSession.send"><code class="docutils literal notranslate"><span class="pre">ChatSession.send()</span></code></a></li>
@@ -4230,6 +4291,7 @@ block keeps the scope for its lifetime.</p>
 <li><a class="reference internal" href="#aix.batch_chat"><code class="docutils literal notranslate"><span class="pre">batch_chat()</span></code></a></li>
 <li><a class="reference internal" href="#aix.batch_embeddings"><code class="docutils literal notranslate"><span class="pre">batch_embeddings()</span></code></a></li>
 <li><a class="reference internal" href="#aix.batch_process"><code class="docutils literal notranslate"><span class="pre">batch_process()</span></code></a></li>
+<li><a class="reference internal" href="#aix.call_logger"><code class="docutils literal notranslate"><span class="pre">call_logger()</span></code></a></li>
 <li><a class="reference internal" href="#aix.chat"><code class="docutils literal notranslate"><span class="pre">chat()</span></code></a></li>
 <li><a class="reference internal" href="#aix.chat_with_history"><code class="docutils literal notranslate"><span class="pre">chat_with_history()</span></code></a></li>
 <li><a class="reference internal" href="#aix.check_keys"><code class="docutils literal notranslate"><span class="pre">check_keys()</span></code></a></li>
@@ -4254,6 +4316,7 @@ block keeps the scope for its lifetime.</p>
 <li><a class="reference internal" href="#aix.get_config"><code class="docutils literal notranslate"><span class="pre">get_config()</span></code></a></li>
 <li><a class="reference internal" href="#aix.get_model_info"><code class="docutils literal notranslate"><span class="pre">get_model_info()</span></code></a></li>
 <li><a class="reference internal" href="#aix.get_video_providers"><code class="docutils literal notranslate"><span class="pre">get_video_providers()</span></code></a></li>
+<li><a class="reference internal" href="#aix.jsonl_logger"><code class="docutils literal notranslate"><span class="pre">jsonl_logger()</span></code></a></li>
 <li><a class="reference internal" href="#aix.load_config"><code class="docutils literal notranslate"><span class="pre">load_config()</span></code></a></li>
 <li><a class="reference internal" href="#aix.prompt_func"><code class="docutils literal notranslate"><span class="pre">prompt_func()</span></code></a></li>
 <li><a class="reference internal" href="#aix.prompt_to_json"><code class="docutils literal notranslate"><span class="pre">prompt_to_json()</span></code></a></li>
@@ -4261,6 +4324,7 @@ block keeps the scope for its lifetime.</p>
 <li><a class="reference internal" href="#aix.resolve_api_key"><code class="docutils literal notranslate"><span class="pre">resolve_api_key()</span></code></a></li>
 <li><a class="reference internal" href="#aix.resolve_model"><code class="docutils literal notranslate"><span class="pre">resolve_model()</span></code></a></li>
 <li><a class="reference internal" href="#aix.sample"><code class="docutils literal notranslate"><span class="pre">sample()</span></code></a></li>
+<li><a class="reference internal" href="#aix.set_call_logger"><code class="docutils literal notranslate"><span class="pre">set_call_logger()</span></code></a></li>
 <li><a class="reference internal" href="#aix.set_config"><code class="docutils literal notranslate"><span class="pre">set_config()</span></code></a></li>
 <li><a class="reference internal" href="#aix.supported_params"><code class="docutils literal notranslate"><span class="pre">supported_params()</span></code></a></li>
 <li><a class="reference internal" href="#aix.supports"><code class="docutils literal notranslate"><span class="pre">supports()</span></code></a></li>
@@ -4281,7 +4345,7 @@ block keeps the scope for its lifetime.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=2971d73f"></script>
+</div><script src="../_static/documentation_options.js?v=09c04dd4"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

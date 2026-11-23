@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-23T07:16:23Z",
+  "built_at": "2026-11-23T07:25:36Z",
   "package": {
     "name": "aix",
-    "version": "0.0.61",
+    "version": "0.0.62",
     "display_name": "aix",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "5baf83665ed5f7fb28960282557b3bbcac046caf",
-    "short_commit": "5baf836",
+    "commit": "2859d9c4b5401df3f3e90e6bd2121a4359cd32a8",
+    "short_commit": "2859d9c",
     "branch": "master",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/addaix/aix",
-    "commit_url": "https://github.com/addaix/aix/commit/5baf83665ed5f7fb28960282557b3bbcac046caf",
+    "commit_url": "https://github.com/addaix/aix/commit/2859d9c4b5401df3f3e90e6bd2121a4359cd32a8",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "addaix/aix",
-    "sha": "5baf83665ed5f7fb28960282557b3bbcac046caf",
+    "sha": "2859d9c4b5401df3f3e90e6bd2121a4359cd32a8",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "45129604835",
-    "run_url": "https://github.com/addaix/aix/actions/runs/45129604835",
+    "run_id": "45130720190",
+    "run_url": "https://github.com/addaix/aix/actions/runs/45130720190",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -55,21 +55,21 @@
     "docs_dir": "docsrc"
   },
   "site": {
-    "modules_documented": 24,
-    "objects_documented": 403
+    "modules_documented": 25,
+    "objects_documented": 412
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.62",
+    "latest": "0.0.63",
     "relation": "behind",
     "error": null
   },
-  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout 5baf83665ed5f7fb28960282557b3bbcac046caf\npip install \"epythet==0.2.24\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout 2859d9c4b5401df3f3e90e6bd2121a4359cd32a8\npip install \"epythet==0.2.24\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": false,
     "notes": [
-      "The documented version (0.0.61) is behind the latest release on PyPI (0.0.62): `pip install aix` gives newer code than these docs describe."
+      "The documented version (0.0.62) is behind the latest release on PyPI (0.0.63): `pip install aix` gives newer code than these docs describe."
     ]
   }
 }

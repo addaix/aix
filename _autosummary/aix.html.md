@@ -74,6 +74,9 @@ For detailed documentation, see: [https://github.com/thorwhalen/aix](https://git
 | [`using`](#aix.using)(\*\*overrides)                               | Context manager applying scoped overrides, restored on exit.                                                         |
 | [`load_config`](#aix.load_config)([path, environ])                       | Resolve an [`AixConfig`](#aix.AixConfig) from shipped defaults, TOML file, and env.     |
 | [`resolve_model`](#aix.resolve_model)(model, \*[, config])                 | Resolve a semantic alias (`"fast"`, `"best"`, ...) to a concrete model id.                                           |
+| [`call_logger`](#aix.call_logger)(logger)                                | Log calls made inside the `with` block to `logger`.                                                                  |
+| [`set_call_logger`](#aix.set_call_logger)(logger)                            | Install `logger` for this context (`None` turns logging off).                                                        |
+| [`jsonl_logger`](#aix.jsonl_logger)(path)                                 | A logger that appends one JSON line per call to `path`.                                                              |
 | [`resolve_api_key`](#aix.resolve_api_key)(model_or_provider, \*[, ...])      | Resolve an API key for `model_or_provider` through the documented layers.                                            |
 | [`check_requirements`](#aix.check_requirements)(model_or_provider, \*[, ...])   | Presence-only preflight: ensure a key for `model_or_provider` is resolvable.                                         |
 | [`check_keys`](#aix.check_keys)([providers])                            | Report, per provider, whether a usable API key is discoverable.                                                      |
@@ -118,6 +121,7 @@ For detailed documentation, see: [https://github.com/thorwhalen/aix](https://git
 
 | [`AixConfig`](#aix.AixConfig)([chat, embeddings, image, audio, ...])   | Top-level AIX configuration (single source of truth for defaults).                                                                                           |
 |-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`CallRecord`](#aix.CallRecord)(function, model, caller, ok, seconds)   | One aix call: which function, the model it resolved to, who called, how it ended.                                                                            |
 | [`Completion`](#aix.Completion)(texts[, finish_reasons, usage, ...])    | Everything a chat completion returned, not just the first text.                                                                                              |
 | [`Usage`](#aix.Usage)([prompt_tokens, completion_tokens, ...])     | Token counts billed for one call (or summed over several).                                                                                                   |
 | [`Sample`](#aix.Sample)(text, payload[, finish_reason, ...])        | One drawn answer.                                                                                                                                            |
@@ -244,6 +248,12 @@ Save results to file.
   **filepath** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to save results (JSON)
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### *class* aix.CallRecord(function, model, caller, ok, seconds, error=None, time=0.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One aix call: which function, the model it resolved to, who called, how it ended.
 
 ### *class* aix.ChatSession(system_prompt=None, , model=None, \*\*chat_kwargs)
 
@@ -1568,6 +1578,13 @@ any operation, not just chat or embeddings.
 ... )
 ```
 
+### aix.call_logger(logger)
+
+Log calls made inside the `with` block to `logger`.
+
+* **Return type:**
+  [`Iterator`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator)[[`None`](https://docs.python.org/3/builtins/constants.html#None)]
+
 ### aix.chat(prompt, , model=None, temperature=None, max_tokens=None, stream=False, api_key=None, \*\*kwargs)
 
 Send a chat prompt and get a response.
@@ -1587,6 +1604,8 @@ details and provides a clean, consistent API across all models.
     complete response as string.
   * **api_key** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Explicit API key. If None, resolved from the environment / .env
     / AIX config store for the model’s provider (see aix.credentials).
+  * **on_call** – Optional `fn(CallRecord)` called after the call with the resolved
+    model, the caller and the outcome (opt-in call log, see [`aix.calllog`](aix.calllog.html.md#module-aix.calllog)).
   * **\*\*kwargs** – Additional provider-specific parameters passed to LiteLLM
 * **Returns:**
   Complete response as string
@@ -2462,6 +2481,13 @@ Get list of available video generation providers.
 ['runway', 'pika']
 ```
 
+### aix.jsonl_logger(path)
+
+A logger that appends one JSON line per call to `path`.
+
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`CallRecord`](aix.calllog.html.md#aix.calllog.CallRecord)], [`None`](https://docs.python.org/3/builtins/constants.html#None)]
+
 ### aix.load_config(path=None, , environ=None)
 
 Resolve an [`AixConfig`](#aix.AixConfig) from shipped defaults, TOML file, and env.
@@ -2737,6 +2763,13 @@ Draw `n` answers to `prompt`, each with its finish reason and usage.
         `strategy` / `on_error`, or a reserved kwarg (`messages`, `stream`).
   * [**SamplingError**](#aix.SamplingError) – A request failed and `on_error="raise"`.
 
+### aix.set_call_logger(logger)
+
+Install `logger` for this context (`None` turns logging off).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 ### aix.set_config(config)
 
 Replace the active config wholesale. Returns the new active config.
@@ -2987,6 +3020,7 @@ block keeps the scope for its lifetime.
 | [`ai_models`](aix.ai_models.html.md#module-aix.ai_models)       | AI Model Management Module.                                                                   |
 | [`audio`](aix.audio.html.md#module-aix.audio)               | Audio operations interface for AIX.                                                           |
 | [`batches`](aix.batches.html.md#module-aix.batches)           | Batch processing interface for AIX.                                                           |
+| [`calllog`](aix.calllog.html.md#module-aix.calllog)           | An opt-in log of aix model calls: the resolved model, the caller, the outcome.                |
 | [`capabilities`](aix.capabilities.html.md#module-aix.capabilities) | What a model supports, asked before calling it.                                               |
 | [`claude_cli`](aix.claude_cli.html.md#module-aix.claude_cli)     | A chat backend that runs prompts through the Claude Code CLI (`claude -p`).                   |
 | [`credentials`](aix.credentials.html.md#module-aix.credentials)   | Unified, discoverable API-key / secret resolution for AIX.                                    |

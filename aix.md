@@ -1,4 +1,4 @@
-> built 2026-11-23 07:16 UTC from 5baf836 (master) · aix 0.0.61. Details: build_info.json
+> built 2026-11-23 07:25 UTC from 2859d9c (master) · aix 0.0.62. Details: build_info.json
 
 # index.html.md
 
@@ -2575,6 +2575,82 @@ any operation, not just chat or embeddings.
 ```
 
 
+# _autosummary/aix.calllog.html.md
+
+# aix.calllog
+
+An opt-in log of aix model calls: the resolved model, the caller, the outcome.
+
+Off by default. Nothing is recorded unless a logger is installed, so a failing model
+choice (a typo’d alias, a retired model, a missing key) can go unnoticed only when you
+have not asked to see it. Three ways to turn it on, from narrowest to widest:
+
+- per call, a keyword-only callback: `chat("hi", on_call=print)`;
+- per process or block, `set_call_logger(fn)` / `with call_logger(fn): ...`;
+- from the environment, `AIX_CALL_LOG=/path/to/calls.jsonl` writes one JSON line per
+  call with [`jsonl_logger()`](_autosummary/aix.calllog.html.md#aix.calllog.jsonl_logger) (the prompt and the reply are never recorded).
+
+A logger is any `fn(record: CallRecord) -> None`. It runs after the call, and an
+exception inside it is swallowed so logging can never break a model call.
+
+```pycon
+>>> seen = []
+>>> with call_logger(seen.append):
+...     with _record("chat", "gpt-x", None):
+...         pass
+>>> seen[0].function, seen[0].model, seen[0].ok
+('chat', 'gpt-x', True)
+```
+
+### Module Attributes
+
+| [`ENV_VAR`](_autosummary/aix.calllog.html.md#aix.calllog.ENV_VAR)   | Environment variable holding the path of a JSON-lines file; setting it enables logging.   |
+|------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+
+### Functions
+
+| [`set_call_logger`](_autosummary/aix.calllog.html.md#aix.calllog.set_call_logger)(logger)   | Install `logger` for this context (`None` turns logging off).   |
+|----------------------------------------------------------------------------|-----------------------------------------------------------------|
+| [`call_logger`](_autosummary/aix.calllog.html.md#aix.calllog.call_logger)(logger)       | Log calls made inside the `with` block to `logger`.             |
+| [`jsonl_logger`](_autosummary/aix.calllog.html.md#aix.calllog.jsonl_logger)(path)        | A logger that appends one JSON line per call to `path`.         |
+
+### Classes
+
+| [`CallRecord`](_autosummary/aix.calllog.html.md#aix.calllog.CallRecord)(function, model, caller, ok, seconds)   | One aix call: which function, the model it resolved to, who called, how it ended.   |
+|-----------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------|
+
+### *class* aix.calllog.CallRecord(function, model, caller, ok, seconds, error=None, time=0.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One aix call: which function, the model it resolved to, who called, how it ended.
+
+### aix.calllog.ENV_VAR *= 'AIX_CALL_LOG'*
+
+Environment variable holding the path of a JSON-lines file; setting it enables logging.
+
+### aix.calllog.call_logger(logger)
+
+Log calls made inside the `with` block to `logger`.
+
+* **Return type:**
+  [`Iterator`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator)[[`None`](https://docs.python.org/3/builtins/constants.html#None)]
+
+### aix.calllog.jsonl_logger(path)
+
+A logger that appends one JSON line per call to `path`.
+
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`CallRecord`](_autosummary/aix.calllog.html.md#aix.calllog.CallRecord)], [`None`](https://docs.python.org/3/builtins/constants.html#None)]
+
+### aix.calllog.set_call_logger(logger)
+
+Install `logger` for this context (`None` turns logging off).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+
 # _autosummary/aix.capabilities.html.md
 
 # aix.capabilities
@@ -3396,6 +3472,9 @@ For detailed documentation, see: [https://github.com/thorwhalen/aix](https://git
 | [`using`](_autosummary/aix.html.md#aix.using)(\*\*overrides)                               | Context manager applying scoped overrides, restored on exit.                                                         |
 | [`load_config`](_autosummary/aix.html.md#aix.load_config)([path, environ])                       | Resolve an [`AixConfig`](_autosummary/aix.html.md#aix.AixConfig) from shipped defaults, TOML file, and env.     |
 | [`resolve_model`](_autosummary/aix.html.md#aix.resolve_model)(model, \*[, config])                 | Resolve a semantic alias (`"fast"`, `"best"`, ...) to a concrete model id.                                           |
+| [`call_logger`](_autosummary/aix.html.md#aix.call_logger)(logger)                                | Log calls made inside the `with` block to `logger`.                                                                  |
+| [`set_call_logger`](_autosummary/aix.html.md#aix.set_call_logger)(logger)                            | Install `logger` for this context (`None` turns logging off).                                                        |
+| [`jsonl_logger`](_autosummary/aix.html.md#aix.jsonl_logger)(path)                                 | A logger that appends one JSON line per call to `path`.                                                              |
 | [`resolve_api_key`](_autosummary/aix.html.md#aix.resolve_api_key)(model_or_provider, \*[, ...])      | Resolve an API key for `model_or_provider` through the documented layers.                                            |
 | [`check_requirements`](_autosummary/aix.html.md#aix.check_requirements)(model_or_provider, \*[, ...])   | Presence-only preflight: ensure a key for `model_or_provider` is resolvable.                                         |
 | [`check_keys`](_autosummary/aix.html.md#aix.check_keys)([providers])                            | Report, per provider, whether a usable API key is discoverable.                                                      |
@@ -3440,6 +3519,7 @@ For detailed documentation, see: [https://github.com/thorwhalen/aix](https://git
 
 | [`AixConfig`](_autosummary/aix.html.md#aix.AixConfig)([chat, embeddings, image, audio, ...])   | Top-level AIX configuration (single source of truth for defaults).                                                                                           |
 |-----------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`CallRecord`](_autosummary/aix.html.md#aix.CallRecord)(function, model, caller, ok, seconds)   | One aix call: which function, the model it resolved to, who called, how it ended.                                                                            |
 | [`Completion`](_autosummary/aix.html.md#aix.Completion)(texts[, finish_reasons, usage, ...])    | Everything a chat completion returned, not just the first text.                                                                                              |
 | [`Usage`](_autosummary/aix.html.md#aix.Usage)([prompt_tokens, completion_tokens, ...])     | Token counts billed for one call (or summed over several).                                                                                                   |
 | [`Sample`](_autosummary/aix.html.md#aix.Sample)(text, payload[, finish_reason, ...])        | One drawn answer.                                                                                                                                            |
@@ -3566,6 +3646,12 @@ Save results to file.
   **filepath** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Path to save results (JSON)
 * **Return type:**
   [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
+### *class* aix.CallRecord(function, model, caller, ok, seconds, error=None, time=0.0)
+
+Bases: [`object`](https://docs.python.org/3/builtins/functions.html#object)
+
+One aix call: which function, the model it resolved to, who called, how it ended.
 
 ### *class* aix.ChatSession(system_prompt=None, , model=None, \*\*chat_kwargs)
 
@@ -4890,6 +4976,13 @@ any operation, not just chat or embeddings.
 ... )
 ```
 
+### aix.call_logger(logger)
+
+Log calls made inside the `with` block to `logger`.
+
+* **Return type:**
+  [`Iterator`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Iterator)[[`None`](https://docs.python.org/3/builtins/constants.html#None)]
+
 ### aix.chat(prompt, , model=None, temperature=None, max_tokens=None, stream=False, api_key=None, \*\*kwargs)
 
 Send a chat prompt and get a response.
@@ -4909,6 +5002,8 @@ details and provides a clean, consistent API across all models.
     complete response as string.
   * **api_key** ([`str`](https://docs.python.org/3/builtins/stdtypes.html#str)) – Explicit API key. If None, resolved from the environment / .env
     / AIX config store for the model’s provider (see aix.credentials).
+  * **on_call** – Optional `fn(CallRecord)` called after the call with the resolved
+    model, the caller and the outcome (opt-in call log, see [`aix.calllog`](_autosummary/aix.calllog.html.md#module-aix.calllog)).
   * **\*\*kwargs** – Additional provider-specific parameters passed to LiteLLM
 * **Returns:**
   Complete response as string
@@ -5784,6 +5879,13 @@ Get list of available video generation providers.
 ['runway', 'pika']
 ```
 
+### aix.jsonl_logger(path)
+
+A logger that appends one JSON line per call to `path`.
+
+* **Return type:**
+  [`Callable`](https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable)[[[`CallRecord`](_autosummary/aix.calllog.html.md#aix.calllog.CallRecord)], [`None`](https://docs.python.org/3/builtins/constants.html#None)]
+
 ### aix.load_config(path=None, , environ=None)
 
 Resolve an [`AixConfig`](_autosummary/aix.html.md#aix.AixConfig) from shipped defaults, TOML file, and env.
@@ -6059,6 +6161,13 @@ Draw `n` answers to `prompt`, each with its finish reason and usage.
         `strategy` / `on_error`, or a reserved kwarg (`messages`, `stream`).
   * [**SamplingError**](_autosummary/aix.html.md#aix.SamplingError) – A request failed and `on_error="raise"`.
 
+### aix.set_call_logger(logger)
+
+Install `logger` for this context (`None` turns logging off).
+
+* **Return type:**
+  [`None`](https://docs.python.org/3/builtins/constants.html#None)
+
 ### aix.set_config(config)
 
 Replace the active config wholesale. Returns the new active config.
@@ -6309,6 +6418,7 @@ block keeps the scope for its lifetime.
 | [`ai_models`](_autosummary/aix.ai_models.html.md#module-aix.ai_models)       | AI Model Management Module.                                                                   |
 | [`audio`](_autosummary/aix.audio.html.md#module-aix.audio)               | Audio operations interface for AIX.                                                           |
 | [`batches`](_autosummary/aix.batches.html.md#module-aix.batches)           | Batch processing interface for AIX.                                                           |
+| [`calllog`](_autosummary/aix.calllog.html.md#module-aix.calllog)           | An opt-in log of aix model calls: the resolved model, the caller, the outcome.                |
 | [`capabilities`](_autosummary/aix.capabilities.html.md#module-aix.capabilities) | What a model supports, asked before calling it.                                               |
 | [`claude_cli`](_autosummary/aix.claude_cli.html.md#module-aix.claude_cli)     | A chat backend that runs prompts through the Claude Code CLI (`claude -p`).                   |
 | [`credentials`](_autosummary/aix.credentials.html.md#module-aix.credentials)   | Unified, discoverable API-key / secret resolution for AIX.                                    |
@@ -8199,18 +8309,18 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-23 07:16 UTC** from commit <a href="https://github.com/addaix/aix/commit/5baf83665ed5f7fb28960282557b3bbcac046caf"><code>5baf836</code></a> on branch <code>master</code>, for **aix 0.0.61** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-23 07:25 UTC** from commit <a href="https://github.com/addaix/aix/commit/2859d9c4b5401df3f3e90e6bd2121a4359cd32a8"><code>2859d9c</code></a> on branch <code>master</code>, for **aix 0.0.62** (from <code>pyproject.toml</code>).
 
 #### WARNING
 The documentation and the package may be misaligned:
 
-- The documented version (0.0.61) is behind the latest release on PyPI (0.0.62): `pip install aix` gives newer code than these docs describe.
+- The documented version (0.0.62) is behind the latest release on PyPI (0.0.63): `pip install aix` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/5baf83665ed5f7fb28960282557b3bbcac046caf"><code>5baf83665ed5f7fb28960282557b3bbcac046caf</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/2859d9c4b5401df3f3e90e6bd2121a4359cd32a8"><code>2859d9c4b5401df3f3e90e6bd2121a4359cd32a8</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -8221,9 +8331,9 @@ The documentation and the package may be misaligned:
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45129604835">45129604835</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45130720190">45130720190</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>5baf83665ed5f7fb28960282557b3bbcac046caf</code> (in the history of the built commit) |
+| Event commit | <code>2859d9c4b5401df3f3e90e6bd2121a4359cd32a8</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8248,13 +8358,13 @@ The documentation and the package may be misaligned:
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.62/">0.0.62</a>, newer than the documented version (0.0.61).
+Latest release: <a href="https://pypi.org/project/aix/0.0.63/">0.0.63</a>, newer than the documented version (0.0.62).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 5baf83665ed5f7fb28960282557b3bbcac046caf
+git checkout 2859d9c4b5401df3f3e90e6bd2121a4359cd32a8
 pip install "epythet==0.2.24"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```
