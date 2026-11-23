@@ -183,3 +183,25 @@ def test_preflight_resolves_aliases(no_keys, monkeypatch):
             f(model="seer")  # no anthropic key: the alias's provider is checked
         monkeypatch.setenv("ANTHROPIC_API_KEY", "sk-test")
         assert f(model="seer") == "seer"  # the wrapped call still sees the alias
+
+
+class TestKeylessLocalModels:
+    """Local providers (Ollama) need no API key (#80)."""
+
+    @pytest.mark.parametrize("model", ["ollama/mistral:7b", "ollama_chat/llama3"])
+    def test_check_requirements_demands_no_key(self, model, no_keys):
+        assert check_requirements(model) is True
+
+    def test_remote_models_still_demand_a_key(self, no_keys):
+        with pytest.raises(MissingCredentialError):
+            check_requirements("openrouter")
+
+    @patch.object(_aix_chat, "_litellm_completion")
+    def test_chat_runs_without_a_key(self, mock_completion, no_keys):
+        resp = Mock()
+        resp.choices = [Mock()]
+        resp.choices[0].message = Mock()
+        resp.choices[0].message.content = "hi"
+        mock_completion.return_value = resp
+        assert _aix_chat.chat("hi", model="ollama/mistral:7b") == "hi"
+        assert "api_key" not in mock_completion.call_args[1]
