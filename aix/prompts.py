@@ -30,6 +30,7 @@ Examples:
 
 import re
 import json
+import keyword
 import string as _string
 from collections.abc import Callable
 from typing import Union, Any, Literal, get_type_hints
@@ -183,12 +184,14 @@ def _format_ready_template(template: str, *, ignore_pattern=DFLT_IGNORE_PATTERN)
     'List {n} facts about {topic}'
     >>> _format_ready_template("```{kept}``` and {x:y}")
     '```{{kept}}``` and {x}'
+    >>> _format_ready_template("Use {{braces}} for {x}")  # escapes survive (#93)
+    'Use {{braces}} for {x}'
     """
 
     def _strip_specifiers(chunk: str) -> str:
         out = []
         for literal, field_name, _, _ in _string_formatter.parse(chunk):
-            out.append(literal)
+            out.append(_double_braces(literal))  # parse() returned {{ }} unescaped
             if field_name is not None:
                 out.append("{" + field_name + "}")
         return "".join(out)
@@ -489,17 +492,20 @@ def prompt_func(
 
     # Expose the template fields to anything that reads signatures (CLI/MCP
     # builders, IDEs, help()): keyword-only, template order, template defaults.
-    generated_function.__signature__ = Signature(
-        [
-            Parameter(
-                param,
-                Parameter.KEYWORD_ONLY,
-                default=template_defaults.get(param, Parameter.empty),
-                annotation=str,
-            )
-            for param in param_names
-        ]
-    )
+    # A field that is not a valid parameter name ({class}, {0}, {user.name}) keeps the
+    # plain ``(**kwargs)`` signature, as before signatures were exposed (#93).
+    if all(p.isidentifier() and not keyword.iskeyword(p) for p in param_names):
+        generated_function.__signature__ = Signature(
+            [
+                Parameter(
+                    param,
+                    Parameter.KEYWORD_ONLY,
+                    default=template_defaults.get(param, Parameter.empty),
+                    annotation=str,
+                )
+                for param in param_names
+            ]
+        )
 
     # Add metadata
     generated_function.template = template
