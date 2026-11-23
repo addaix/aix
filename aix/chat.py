@@ -59,6 +59,7 @@ from aix.credentials import (
     requires_credentials as _requires_credentials,
 )
 
+from aix.calllog import _record
 from aix._litellm import UNRESOLVED as _UNRESOLVED, litellm_attr as _litellm_attr
 from aix.structured import (
     ResponseSchema as _ResponseSchema,
@@ -498,6 +499,32 @@ def request_kwargs(
     return kwargs
 
 
+def _logged(function: str):
+    """Record each call of ``chat``/``complete`` to the opt-in call log (:mod:`aix.calllog`).
+
+    Adds the keyword-only ``on_call=`` seam: ``fn(CallRecord)``, called after the call with
+    the resolved model, the caller, and the outcome. Without it, nothing is recorded unless
+    a logger was installed (``set_call_logger``) or ``AIX_CALL_LOG`` is set. For a streaming
+    ``chat`` the record covers the call that opens the stream.
+    """
+
+    def decorate(func):
+        @wraps(func)
+        def wrapper(*args, on_call=None, **kwargs):
+            try:
+                model = _resolve_model(kwargs.get("model") or _get_config().chat.model)
+            except Exception:  # noqa: BLE001 - never let logging break a call
+                model = kwargs.get("model")
+            with _record(function, model, on_call):
+                return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorate
+
+
+
+@_logged("chat")
 @_requires_credentials(lambda: _get_config().chat.model)
 def chat(
     prompt: Union[str, Iterable[dict]],
@@ -526,6 +553,8 @@ def chat(
             complete response as string.
         api_key: Explicit API key. If None, resolved from the environment / .env
             / AIX config store for the model's provider (see aix.credentials).
+        on_call: Optional ``fn(CallRecord)`` called after the call with the resolved
+            model, the caller and the outcome (opt-in call log, see :mod:`aix.calllog`).
         **kwargs: Additional provider-specific parameters passed to LiteLLM
 
     Returns:
@@ -625,6 +654,7 @@ def _validate_complete_args(func):
     return wrapper
 
 
+@_logged("complete")
 @_validate_complete_args
 @_requires_credentials(lambda: _get_config().chat.model)
 def complete(

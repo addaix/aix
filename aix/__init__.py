@@ -146,6 +146,13 @@ from aix.vision import (
     ImageComparison,
 )
 
+from aix.calllog import (
+    CallRecord,
+    call_logger,
+    set_call_logger,
+    jsonl_logger,
+)
+
 # Legacy interfaces (for backward compatibility)
 from aix.gen_ai import chat_models, chat_funcs
 
@@ -168,6 +175,11 @@ __all__ = [
     "using",
     "load_config",
     "resolve_model",
+    # Opt-in call log
+    "CallRecord",
+    "call_logger",
+    "set_call_logger",
+    "jsonl_logger",
     # Credentials
     "resolve_api_key",
     "check_requirements",
