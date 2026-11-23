@@ -585,7 +585,13 @@ def chat(
         '2+2 equals 4.'
     """
     routed = _claude_cli_route(
-        prompt, model, temperature=temperature, max_tokens=max_tokens, stream=stream
+        prompt,
+        model,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        stream=stream,
+        api_key=api_key,
+        **kwargs,
     )
     if routed is not None:
         return routed.text
@@ -740,6 +746,9 @@ def complete(
         seed=seed,
         response_format=response_format,
         response_schema=response_schema,
+        max_repairs=max_repairs,
+        api_key=api_key,
+        **kwargs,
     )
     if routed is not None:
         return routed

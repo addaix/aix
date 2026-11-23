@@ -144,12 +144,14 @@ MODEL_PREFIX_PROVIDERS: dict[str, str] = {
     "gpt-image-": "openai",
     "whisper-": "openai",
     "tts-": "openai",
-    "text-embedding-": "openai",
+    # not "text-embedding-": Google's text-embedding-004/-005 are Vertex models (#91)
+    "text-embedding-3": "openai",
+    "text-embedding-ada": "openai",
     "o1": "openai",
     "o3": "openai",
     "o4": "openai",
     "claude-": "anthropic",
-    "gemini-": "gemini",
+    # no bare "gemini-": LiteLLM routes those to Vertex AI, not the Gemini API (#91)
     "mistral-": "mistral",
     "deepseek-": "deepseek",
     "grok-": "xai",
@@ -157,7 +159,13 @@ MODEL_PREFIX_PROVIDERS: dict[str, str] = {
 
 
 #: Model-id prefixes whose provider runs locally and needs no API key (extend to add more).
-KEYLESS_MODEL_PREFIXES: tuple[str, ...] = ("ollama/", "ollama_chat/")
+KEYLESS_MODEL_PREFIXES: tuple[str, ...] = (
+    "ollama/",
+    "ollama_chat/",
+    "lm_studio/",
+    "hosted_vllm/",
+    "llamafile/",
+)
 
 
 def is_keyless(model_or_provider: Optional[str]) -> bool:
@@ -167,9 +175,17 @@ def is_keyless(model_or_provider: Optional[str]) -> bool:
     True
     >>> is_keyless("gpt-4o")
     False
+
+    A bare provider name counts too (``check_requirements("ollama")``):
+
+    >>> is_keyless("ollama"), is_keyless("lm_studio/qwen")
+    (True, True)
     """
-    return bool(model_or_provider) and model_or_provider.startswith(
-        KEYLESS_MODEL_PREFIXES
+    if not model_or_provider:
+        return False
+    bare = tuple(p.rstrip("/") for p in KEYLESS_MODEL_PREFIXES)
+    return model_or_provider.startswith(KEYLESS_MODEL_PREFIXES) or (
+        model_or_provider in bare
     )
 
 
@@ -182,7 +198,13 @@ def _infer_provider_from_prefix(model: str) -> Optional[str]:
     'anthropic'
     >>> _infer_provider_from_prefix("openai/gpt-4o") is None  # prefixed: LiteLLM's job
     True
+    >>> _infer_provider_from_prefix("claude-cli/haiku") is None
+    True
+    >>> _infer_provider_from_prefix("text-embedding-004") is None  # Vertex: LiteLLM's job
+    True
     """
+    if "/" in model:  # a provider-prefixed id is LiteLLM's to classify (#91)
+        return None
     for prefix, provider in MODEL_PREFIX_PROVIDERS.items():
         if model.startswith(prefix):
             return provider
