@@ -25,6 +25,8 @@ pip install "aix[openai]"     # legacy OpenAI (oa) backend
 pip install "aix[all]"        # all optional backends
 ```
 
+With a Claude subscription and the [Claude Code CLI](https://docs.claude.com/en/docs/claude-code/setup) installed, `chat("...", model="claude-cli/haiku")` (or `sonnet`, `opus`) runs the prompt through `claude -p` with no API key. The CLI has no sampling controls, so `temperature`, `max_tokens`, `stream` and the like raise `ValueError`; the cost it reports is `claude_cli_cost(complete(...))`.
+
 ## Quick Start
 
 <!-- wads-docs: skip needs a provider API key -->
