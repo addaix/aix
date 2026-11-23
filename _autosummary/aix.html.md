@@ -2988,6 +2988,7 @@ block keeps the scope for its lifetime.
 | [`audio`](aix.audio.html.md#module-aix.audio)               | Audio operations interface for AIX.                                                           |
 | [`batches`](aix.batches.html.md#module-aix.batches)           | Batch processing interface for AIX.                                                           |
 | [`capabilities`](aix.capabilities.html.md#module-aix.capabilities) | What a model supports, asked before calling it.                                               |
+| [`claude_cli`](aix.claude_cli.html.md#module-aix.claude_cli)     | A chat backend that runs prompts through the Claude Code CLI (`claude -p`).                   |
 | [`credentials`](aix.credentials.html.md#module-aix.credentials)   | Unified, discoverable API-key / secret resolution for AIX.                                    |
 | [`gen_ai`](aix.gen_ai.html.md#module-aix.gen_ai)             | Generative AI modules.                                                                        |
 | [`image`](aix.image.html.md#module-aix.image)               | Image generation interface for AIX.                                                           |

@@ -211,6 +211,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.audio.html">aix.audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.batches.html">aix.batches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.capabilities.html">aix.capabilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.claude_cli.html">aix.claude_cli</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.credentials.html">aix.credentials</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/aix.gen_ai.html">aix.gen_ai</a><input aria-label="Toggle navigation of aix.gen_ai" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/aix.gen_ai.google_genai.html">aix.gen_ai.google_genai</a></li>
@@ -344,6 +345,13 @@
 </li>
         </ul></li>
         <li>
+    aix.claude_cli
+
+        <ul>
+          <li><a href="_autosummary/aix.claude_cli.html#module-aix.claude_cli">module</a>
+</li>
+        </ul></li>
+        <li>
     aix.config
 
         <ul>
@@ -385,6 +393,8 @@
           <li><a href="_autosummary/aix.image.html#module-aix.image">module</a>
 </li>
         </ul></li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     aix.misc
 
@@ -392,8 +402,6 @@
           <li><a href="_autosummary/aix.misc.html#module-aix.misc">module</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     aix.prompts
 
@@ -563,6 +571,8 @@
 </li>
         <li><a href="_autosummary/aix.html#aix.ChatSession">ChatSession (class in aix)</a>
 </li>
+        <li><a href="_autosummary/aix.claude_cli.html#aix.claude_cli.check_claude_cli">check_claude_cli() (in module aix.claude_cli)</a>
+</li>
         <li><a href="_autosummary/aix.html#aix.check_keys">check_keys() (in module aix)</a>
 
         <ul>
@@ -577,6 +587,10 @@
           <li><a href="_autosummary/aix.credentials.html#aix.credentials.check_requirements">(in module aix.credentials)</a>
 </li>
         </ul></li>
+        <li><a href="_autosummary/aix.claude_cli.html#aix.claude_cli.claude_cli_complete">claude_cli_complete() (in module aix.claude_cli)</a>
+</li>
+        <li><a href="_autosummary/aix.claude_cli.html#aix.claude_cli.claude_cli_cost">claude_cli_cost() (in module aix.claude_cli)</a>
+</li>
         <li><a href="_autosummary/aix.batches.html#aix.batches.BatchProcessor.clear">clear() (aix.batches.BatchProcessor method)</a>
 
         <ul>
@@ -597,10 +611,10 @@
         </ul></li>
         <li><a href="_autosummary/aix.html#aix.complete">complete() (in module aix)</a>
 </li>
-        <li><a href="_autosummary/aix.html#aix.Completion">Completion (class in aix)</a>
-</li>
     </ul></td>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="_autosummary/aix.html#aix.Completion">Completion (class in aix)</a>
+</li>
         <li><a href="_autosummary/aix.sampling.html#aix.sampling.concurrent_map">concurrent_map() (in module aix.sampling)</a>
 </li>
         <li><a href="_autosummary/aix.html#aix.ImageComparison.confidence">confidence (aix.ImageComparison attribute)</a>
@@ -1003,6 +1017,8 @@
         </ul></li>
         <li><a href="_autosummary/aix.video.html#aix.video.interpolate_frames">interpolate_frames() (in module aix.video)</a>
 </li>
+        <li><a href="_autosummary/aix.claude_cli.html#aix.claude_cli.is_claude_cli_model">is_claude_cli_model() (in module aix.claude_cli)</a>
+</li>
         <li><a href="_autosummary/aix.credentials.html#aix.credentials.is_keyless">is_keyless() (in module aix.credentials)</a>
 </li>
     </ul></td>
@@ -1149,10 +1165,10 @@
           <li><a href="_autosummary/aix.ai_models.base.html#aix.ai_models.base.ModelSource">(class in aix.ai_models.base)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_autosummary/aix.html#aix.ModelStore">ModelStore (class in aix)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li>
     module
 
@@ -1172,6 +1188,8 @@
           <li><a href="_autosummary/aix.batches.html#module-aix.batches">aix.batches</a>
 </li>
           <li><a href="_autosummary/aix.capabilities.html#module-aix.capabilities">aix.capabilities</a>
+</li>
+          <li><a href="_autosummary/aix.claude_cli.html#module-aix.claude_cli">aix.claude_cli</a>
 </li>
           <li><a href="_autosummary/aix.config.html#module-aix.config">aix.config</a>
 </li>
@@ -1384,6 +1402,8 @@
 </li>
         <li><a href="_autosummary/aix.html#aix.ModelStore.recommend">recommend() (aix.ModelStore method)</a>
 </li>
+        <li><a href="_autosummary/aix.claude_cli.html#aix.claude_cli.refuse_unsupported">refuse_unsupported() (in module aix.claude_cli)</a>
+</li>
         <li><a href="_autosummary/aix.ai_models.manager.html#aix.ai_models.manager.ModelManager.register_connector">register_connector() (aix.ai_models.manager.ModelManager method)</a>
 
         <ul>
@@ -1400,14 +1420,14 @@
 </li>
         <li><a href="_autosummary/aix.credentials.html#aix.credentials.requires_credentials">requires_credentials() (in module aix.credentials)</a>
 </li>
+    </ul></td>
+    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_autosummary/aix.html#aix.resolve_api_key">resolve_api_key() (in module aix)</a>
 
         <ul>
           <li><a href="_autosummary/aix.credentials.html#aix.credentials.resolve_api_key">(in module aix.credentials)</a>
 </li>
         </ul></li>
-    </ul></td>
-    <td style="width: 33%; vertical-align: top;"><ul>
         <li><a href="_autosummary/aix.html#aix.resolve_model">resolve_model() (in module aix)</a>
 
         <ul>
@@ -1630,6 +1650,8 @@
   <h2>U</h2>
   <table style="width: 100%" class="indextable genindextable"><tr>
     <td style="width: 33%; vertical-align: top;"><ul>
+        <li><a href="_autosummary/aix.claude_cli.html#aix.claude_cli.UNSUPPORTED_PARAMS">UNSUPPORTED_PARAMS (in module aix.claude_cli)</a>
+</li>
         <li><a href="_autosummary/aix.html#aix.Completion.usage">usage (aix.Completion attribute)</a>
 
         <ul>
@@ -1746,7 +1768,7 @@
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=fd9d99c4"></script>
+</div><script src="_static/documentation_options.js?v=54ddeda2"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

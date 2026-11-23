@@ -97,6 +97,7 @@
    audio
    batches
    capabilities
+   claude_cli
    credentials
    gen_ai
    image

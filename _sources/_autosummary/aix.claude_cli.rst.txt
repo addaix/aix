@@ -1,0 +1,22 @@
+aix.claude\_cli
+===============
+
+.. automodule:: aix.claude_cli
+
+   
+   .. rubric:: Module Attributes
+
+   .. autosummary::
+   
+      UNSUPPORTED_PARAMS
+   
+   .. rubric:: Functions
+
+   .. autosummary::
+   
+      check_claude_cli
+      claude_cli_complete
+      claude_cli_cost
+      is_claude_cli_model
+      refuse_unsupported
+   

@@ -215,6 +215,7 @@
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.audio.html">aix.audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.batches.html">aix.batches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.capabilities.html">aix.capabilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.claude_cli.html">aix.claude_cli</a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/aix.credentials.html">aix.credentials</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="_autosummary/aix.gen_ai.html">aix.gen_ai</a><input aria-label="Toggle navigation of aix.gen_ai" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/aix.gen_ai.google_genai.html">aix.gen_ai.google_genai</a></li>
@@ -297,6 +298,7 @@ pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"aix[
 pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"aix[all]"</span><span class="w">        </span><span class="c1"># all optional backends</span>
 </pre></div>
 </div>
+<p>With a Claude subscription and the <a class="reference external" href="https://docs.claude.com/en/docs/claude-code/setup">Claude Code CLI</a> installed, <code class="docutils literal notranslate"><span class="pre">chat(&quot;...&quot;,</span> <span class="pre">model=&quot;claude-cli/haiku&quot;)</span></code> (or <code class="docutils literal notranslate"><span class="pre">sonnet</span></code>, <code class="docutils literal notranslate"><span class="pre">opus</span></code>) runs the prompt through <code class="docutils literal notranslate"><span class="pre">claude</span> <span class="pre">-p</span></code> with no API key. The CLI has no sampling controls, so <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, <code class="docutils literal notranslate"><span class="pre">max_tokens</span></code>, <code class="docutils literal notranslate"><span class="pre">stream</span></code> and the like raise <code class="docutils literal notranslate"><span class="pre">ValueError</span></code>; the cost it reports is <code class="docutils literal notranslate"><span class="pre">claude_cli_cost(complete(...))</span></code>.</p>
 </section>
 <section id="quick-start">
 <h2>Quick Start<a class="headerlink" href="#quick-start" title="Link to this heading">¶</a></h2>
@@ -1138,7 +1140,7 @@ resolving — pass those provider-prefixed (<code class="docutils literal notran
 </section>
 </section>
 
-<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-23 02:34 UTC from <a href="https://github.com/addaix/aix/commit/fdc42c9a4b670a67cff1b6d1aedc8b6e2cc20e47">fdc42c9</a> (master) · aix 0.0.58 · <a href="about-this-build.html">about this build</a></p>
+<p class="epythet-provenance" style="font-size:.8em;opacity:.65;margin-top:2.5em;text-align:right">built 2026-11-23 02:58 UTC from <a href="https://github.com/addaix/aix/commit/2beec12673dbe9f1dcc92b2b0764dfb2fb26bf8d">2beec12</a> (master) · aix 0.0.59 · <a href="about-this-build.html">about this build</a></p>
         </article>
       </div>
       <footer>
@@ -1256,7 +1258,7 @@ resolving — pass those provider-prefixed (<code class="docutils literal notran
       
     </aside>
   </div>
-</div><script src="_static/documentation_options.js?v=fd9d99c4"></script>
+</div><script src="_static/documentation_options.js?v=54ddeda2"></script>
     <script src="_static/doctools.js?v=fd6eb6e6"></script>
     <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

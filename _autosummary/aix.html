@@ -215,6 +215,7 @@
 <li class="toctree-l3"><a class="reference internal" href="aix.audio.html">aix.audio</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aix.batches.html">aix.batches</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aix.capabilities.html">aix.capabilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="aix.claude_cli.html">aix.claude_cli</a></li>
 <li class="toctree-l3"><a class="reference internal" href="aix.credentials.html">aix.credentials</a></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="aix.gen_ai.html">aix.gen_ai</a><input aria-label="Toggle navigation of aix.gen_ai" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
 <li class="toctree-l4"><a class="reference internal" href="aix.gen_ai.google_genai.html">aix.gen_ai.google_genai</a></li>
@@ -3983,40 +3984,43 @@ block keeps the scope for its lifetime.</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="aix.capabilities.html#module-aix.capabilities" title="aix.capabilities"><code class="xref py py-obj docutils literal notranslate"><span class="pre">capabilities</span></code></a></p></td>
 <td><p>What a model supports, asked before calling it.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.credentials.html#module-aix.credentials" title="aix.credentials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">credentials</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.claude_cli.html#module-aix.claude_cli" title="aix.claude_cli"><code class="xref py py-obj docutils literal notranslate"><span class="pre">claude_cli</span></code></a></p></td>
+<td><p>A chat backend that runs prompts through the Claude Code CLI (<code class="docutils literal notranslate"><span class="pre">claude</span> <span class="pre">-p</span></code>).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.credentials.html#module-aix.credentials" title="aix.credentials"><code class="xref py py-obj docutils literal notranslate"><span class="pre">credentials</span></code></a></p></td>
 <td><p>Unified, discoverable API-key / secret resolution for AIX.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.gen_ai.html#module-aix.gen_ai" title="aix.gen_ai"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_ai</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.gen_ai.html#module-aix.gen_ai" title="aix.gen_ai"><code class="xref py py-obj docutils literal notranslate"><span class="pre">gen_ai</span></code></a></p></td>
 <td><p>Generative AI modules.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.image.html#module-aix.image" title="aix.image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">image</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.image.html#module-aix.image" title="aix.image"><code class="xref py py-obj docutils literal notranslate"><span class="pre">image</span></code></a></p></td>
 <td><p>Image generation interface for AIX.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.misc.html#module-aix.misc" title="aix.misc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">misc</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.misc.html#module-aix.misc" title="aix.misc"><code class="xref py py-obj docutils literal notranslate"><span class="pre">misc</span></code></a></p></td>
 <td><p>Misc AIX functions.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.models.html#aix.models" title="aix.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.models.html#aix.models" title="aix.models"><code class="xref py py-obj docutils literal notranslate"><span class="pre">models</span></code></a></p></td>
 <td><p>User-friendly interface for model discovery and selection.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.prompts.html#module-aix.prompts" title="aix.prompts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompts</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.prompts.html#module-aix.prompts" title="aix.prompts"><code class="xref py py-obj docutils literal notranslate"><span class="pre">prompts</span></code></a></p></td>
 <td><p>Prompt-based function creation for AIX.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.sampling.html#module-aix.sampling" title="aix.sampling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sampling</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.sampling.html#module-aix.sampling" title="aix.sampling"><code class="xref py py-obj docutils literal notranslate"><span class="pre">sampling</span></code></a></p></td>
 <td><p>Repeated sampling: <code class="docutils literal notranslate"><span class="pre">n</span></code> answers to one prompt, drawn as fast as the provider allows.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.stores.html#module-aix.stores" title="aix.stores"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stores</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.stores.html#module-aix.stores" title="aix.stores"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stores</span></code></a></p></td>
 <td><p>Storage layers for AIX.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.structured.html#module-aix.structured" title="aix.structured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">structured</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.structured.html#module-aix.structured" title="aix.structured"><code class="xref py py-obj docutils literal notranslate"><span class="pre">structured</span></code></a></p></td>
 <td><p>Structured output: a schema in, validated values out, enforced as far as the provider allows.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.util.html#module-aix.util" title="aix.util"><code class="xref py py-obj docutils literal notranslate"><span class="pre">util</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.util.html#module-aix.util" title="aix.util"><code class="xref py py-obj docutils literal notranslate"><span class="pre">util</span></code></a></p></td>
 <td><p>Utils for AIX.</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="aix.video.html#module-aix.video" title="aix.video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">video</span></code></a></p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="aix.video.html#module-aix.video" title="aix.video"><code class="xref py py-obj docutils literal notranslate"><span class="pre">video</span></code></a></p></td>
 <td><p>Video generation interface for AIX.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="aix.vision.html#module-aix.vision" title="aix.vision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vision</span></code></a></p></td>
+<tr class="row-even"><td><p><a class="reference internal" href="aix.vision.html#module-aix.vision" title="aix.vision"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vision</span></code></a></p></td>
 <td><p>Image-to-text (vision) interface for AIX.</p></td>
 </tr>
 </tbody>
@@ -4277,7 +4281,7 @@ block keeps the scope for its lifetime.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=fd9d99c4"></script>
+</div><script src="../_static/documentation_options.js?v=54ddeda2"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>

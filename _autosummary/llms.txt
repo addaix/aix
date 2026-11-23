@@ -14,6 +14,7 @@
 - [aix.audio](aix.audio.html.md): Audio operations interface for AIX.
 - [aix.batches](aix.batches.html.md): Batch processing interface for AIX.
 - [aix.capabilities](aix.capabilities.html.md): What a model supports, asked before calling it.
+- [aix.claude_cli](aix.claude_cli.html.md): A chat backend that runs prompts through the Claude Code CLI (&#96;claude -p&#96;).
 - [aix.credentials](aix.credentials.html.md): Unified, discoverable API-key / secret resolution for AIX.
 - [aix.gen_ai](aix.gen_ai.html.md): Generative AI modules.
 - [aix.gen_ai.google_genai](aix.gen_ai.google_genai.html.md): Google GenAI API functionality.
