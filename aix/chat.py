@@ -523,7 +523,6 @@ def _logged(function: str):
     return decorate
 
 
-
 @_logged("chat")
 @_requires_credentials(lambda: _get_config().chat.model)
 def chat(
