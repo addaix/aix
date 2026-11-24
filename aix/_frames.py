@@ -7,31 +7,45 @@ the caller. Both must hold however many aix frames sit in between (``aix.gen_ai.
 dispatching to a backend, a decorator stack, a ``contextlib`` wrapper), so they walk the
 stack instead of counting a fixed number of levels.
 
->>> frame, level = first_external_frame()  # called from outside aix: this very frame
->>> level
-1
+Frames are classified by the module they run in (``frame.f_globals['__name__']``), not
+by file path: no filesystem call (a deleted working directory cannot break it), and it
+holds for frozen builds whose code objects carry relative file names.
+
+>>> is_internal_module('aix.chat'), is_internal_module('contextlib'), is_internal_module('aixy')
+(True, True, False)
 """
 
 from __future__ import annotations
 
-import contextlib
 import os
 import sys
 from types import FrameType
 from typing import Optional
 
-#: Directory of the aix package: frames whose file lives under it are aix's own.
-AIX_DIR = os.path.dirname(os.path.abspath(__file__)) + os.sep
+#: Modules whose frames are plumbing around aix, never the caller (``contextlib`` wraps
+#: aix's own context managers and decorators).
+_PLUMBING = frozenset({"contextlib"})
 
-#: Frames from these files are plumbing, never the caller (``contextlib`` wraps aix's
-#: own context managers and decorators).
-_PLUMBING = (os.path.abspath(contextlib.__file__),)
+#: Modules of the thread machinery a pool worker runs on.
+_THREAD_MACHINERY = ("threading", "concurrent.futures")
 
 
-def is_internal(filename: str) -> bool:
-    """Whether ``filename`` belongs to aix itself (or to plumbing that wraps it)."""
-    path = os.path.abspath(filename)
-    return path.startswith(AIX_DIR) or path in _PLUMBING
+def _module(frame: FrameType) -> str:
+    return frame.f_globals.get("__name__") or ""
+
+
+def _in(module: str, packages) -> bool:
+    return any(module == p or module.startswith(p + ".") for p in packages)
+
+
+def is_internal_module(module: str) -> bool:
+    """Whether code of ``module`` belongs to aix itself (or to plumbing that wraps it)."""
+    return _in(module, ("aix",)) or module in _PLUMBING
+
+
+def is_thread_machinery(frame: Optional[FrameType]) -> bool:
+    """Whether ``frame`` is a thread pool's or ``threading``'s own code."""
+    return frame is not None and _in(_module(frame), _THREAD_MACHINERY)
 
 
 def first_external_frame(*, skip: int = 1) -> tuple[Optional[FrameType], int]:
@@ -45,7 +59,7 @@ def first_external_frame(*, skip: int = 1) -> tuple[Optional[FrameType], int]:
     frame = sys._getframe(skip)
     level = 1
     while frame is not None:
-        if not is_internal(frame.f_code.co_filename):
+        if not is_internal_module(_module(frame)):
             return frame, level
         frame = frame.f_back
         level += 1
@@ -53,7 +67,12 @@ def first_external_frame(*, skip: int = 1) -> tuple[Optional[FrameType], int]:
 
 
 def where(frame: Optional[FrameType]) -> str:
-    """``file:line`` of ``frame``, or ``"?"`` for none."""
+    """``file:line`` of ``frame`` (absolute when it can be), or ``"?"`` for none."""
     if frame is None:
         return "?"
-    return f"{os.path.abspath(frame.f_code.co_filename)}:{frame.f_lineno}"
+    filename = frame.f_code.co_filename
+    try:
+        filename = os.path.abspath(filename)
+    except OSError:  # e.g. a relative name while the working directory is gone
+        pass
+    return f"{filename}:{frame.f_lineno}"

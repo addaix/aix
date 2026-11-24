@@ -18,7 +18,10 @@ Logged entry points: ``chat``, ``complete`` (and what is built on them: ``sample
 ``embeddings`` / ``embed``, ``generate_image`` / ``generate_images`` / ``edit_image`` /
 ``create_variation``, ``text_to_speech``, ``transcribe`` (and
 ``transcribe_with_timestamps``) and ``translate_audio``. A call made on one of aix's own
-worker pools records the line that called aix, not the pool's thread.
+worker pools records the line that called aix, not the pool's thread; one handed
+straight to a thread or pool of your own (``pool.submit(aix.chat, ...)``) records ``"?"``
+(and is only logged there if the logger reaches that thread: ``AIX_CALL_LOG``, or a
+copied context).
 
 >>> seen = []
 >>> with call_logger(seen.append):
@@ -30,7 +33,6 @@ worker pools records the line that called aix, not the pool's thread.
 
 from __future__ import annotations
 
-import concurrent.futures
 import contextlib
 import contextvars
 import inspect
@@ -43,7 +45,7 @@ from dataclasses import asdict, dataclass
 from functools import wraps
 from typing import Optional
 
-from aix._frames import first_external_frame, where
+from aix._frames import first_external_frame, is_thread_machinery, where
 
 __all__ = ["CallRecord", "set_call_logger", "call_logger", "jsonl_logger", "ENV_VAR"]
 
@@ -112,24 +114,24 @@ _submitter: contextvars.ContextVar[Optional[str]] = contextvars.ContextVar(
     "aix_call_submitter", default=None
 )
 
-_THREADING = os.path.abspath(threading.__file__)
-_FUTURES = os.path.dirname(os.path.abspath(concurrent.futures.__file__)) + os.sep
-
-
-def _is_thread_machinery(filename: str) -> bool:
-    path = os.path.abspath(filename)
-    return path == _THREADING or path.startswith(_FUTURES)
+#: Set while a logger runs: a model call made by a logger is not logged (no recursion).
+_in_logger: contextvars.ContextVar[bool] = contextvars.ContextVar(
+    "aix_in_call_logger", default=False
+)
 
 
 def _caller() -> str:
     """``file:line`` of the first frame outside the aix package.
 
-    In a worker of one of aix's own pools, where the first outside frame is the pool's
-    thread machinery, it is the line that called aix in the submitting thread.
+    In a worker of one of aix's own pools (or anything submitted through
+    :func:`aix.config.submit_in_context`), where the first outside frame is the pool's
+    thread machinery, it is the line that called aix in the submitting thread. A call
+    handed straight to a thread or pool of your own (``pool.submit(aix.chat, ...)``) has
+    no line of yours on its stack: its caller is ``"?"``.
     """
     frame, _ = first_external_frame(skip=2)
-    if frame is None or _is_thread_machinery(frame.f_code.co_filename):
-        return _submitter.get() or where(frame)
+    if frame is None or is_thread_machinery(frame):
+        return _submitter.get() or "?"
     return where(frame)
 
 
@@ -137,27 +139,34 @@ def carry_caller(context: contextvars.Context) -> contextvars.Context:
     """Store the current caller in ``context``, a copy to run on another thread.
 
     aix's pools call this (through :func:`aix.config.submit_in_context`) in the submitting
-    thread, so a call made in the worker is logged with the user's line.
+    thread, so a call made in the worker is logged with the user's line. It never fails:
+    on any error the context is returned as it is.
     """
-    caller = _caller()
-    context.run(_submitter.set, caller)
+    try:
+        caller = _caller()
+        context.run(_submitter.set, caller)
+    except Exception:  # noqa: BLE001 - attribution must never break a submit
+        pass
     return context
 
 
 class _Recording:
-    """One call being recorded: :meth:`finish` sends its record, once."""
+    """One call being recorded: :meth:`finish` sends its record, once (thread-safe)."""
 
     def __init__(self, function: str, model: Optional[str], logger: CallLogger):
         self.function, self.model, self.logger = function, model, logger
         self.caller, self.start, self.time = _caller(), time.perf_counter(), time.time()
+        self._lock = threading.Lock()
         self.done = False
 
     def finish(self, exc: Optional[BaseException] = None) -> None:
-        if self.done:
-            return
-        self.done = True
+        with self._lock:
+            if self.done:
+                return
+            self.done = True
         error = None if exc is None else f"{type(exc).__name__}: {exc}"
-        with contextlib.suppress(Exception):
+        token = _in_logger.set(True)
+        try:
             self.logger(
                 CallRecord(
                     function=self.function,
@@ -169,12 +178,16 @@ class _Recording:
                     time=self.time,
                 )
             )
+        except Exception:  # noqa: BLE001 - logging can never break a model call
+            pass
+        finally:
+            _in_logger.reset(token)
 
 
 def _start(
     function: str, model: Optional[str], explicit: Optional[CallLogger]
 ) -> Optional[_Recording]:
-    logger = _active(explicit)
+    logger = None if _in_logger.get() else _active(explicit)
     return None if logger is None else _Recording(function, model, logger)
 
 
@@ -193,49 +206,37 @@ def _record(function: str, model: Optional[str], explicit: Optional[CallLogger])
     recording.finish()
 
 
-class _LoggedStream:
-    """A stream whose record is sent when it ends: exhausted, failed, closed or dropped.
+def _logged_stream(stream: Iterator, recording: _Recording):
+    """Yield from ``stream`` and send the record when it ends.
 
-    So an error raised while the stream is consumed is logged as a failure, and
-    ``seconds`` covers the whole stream.
+    Exhausted: ok. Raised: the error. Closed early or dropped (``close()``, or garbage
+    collection of an unfinished stream): ok, at that moment. It is a generator, so
+    ``send``, ``throw`` and ``close`` reach ``stream`` as they would without logging.
     """
-
-    def __init__(self, stream: Iterator, recording: _Recording):
-        self._stream, self._recording = stream, recording
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        try:
-            return next(self._stream)
-        except StopIteration:
-            self._recording.finish()
-            raise
-        except BaseException as exc:
-            self._recording.finish(exc)
-            raise
-
-    def close(self) -> None:
-        with contextlib.suppress(Exception):
-            close = getattr(self._stream, "close", None)
-            if close is not None:
-                close()
-        self._recording.finish()
-
-    def __del__(self):  # dropped unfinished (e.g. ``next(stream)`` then discarded)
-        try:
-            self._recording.finish()
-        except Exception:  # noqa: BLE001 - e.g. at interpreter shutdown
-            pass
+    try:
+        result = yield from stream
+    except GeneratorExit:
+        recording.finish()
+        raise
+    except BaseException as exc:
+        recording.finish(exc)
+        raise
+    recording.finish()
+    return result
 
 
-def _resolved_model(sig, args, kwargs, default_model) -> Optional[str]:
+def _resolved_model(sig, args, kwargs, default_model, model_of) -> Optional[str]:
     """The model a call will use: its ``model`` argument or the default, alias-resolved."""
     try:
-        model = sig.bind_partial(*args, **kwargs).arguments.get("model")
+        arguments = sig.bind_partial(*args, **kwargs).arguments
     except TypeError:
-        model = kwargs.get("model")
+        arguments = dict(kwargs)
+    model = arguments.get("model")
+    if model_of is not None:
+        with contextlib.suppress(Exception):
+            chosen = model_of(arguments)
+            if chosen is not None:
+                return chosen
     try:
         from aix.config import resolve_model
 
@@ -244,16 +245,24 @@ def _resolved_model(sig, args, kwargs, default_model) -> Optional[str]:
         return model
 
 
-def logged(function: str, *, default_model: Optional[Callable[[], Optional[str]]] = None):
+def logged(
+    function: str,
+    *,
+    default_model: Optional[Callable[[], Optional[str]]] = None,
+    model_of: Optional[Callable[[dict], Optional[str]]] = None,
+):
     """Decorator: record each call of an aix entry point to the opt-in call log.
 
     Adds the keyword-only ``on_call=`` seam: ``fn(CallRecord)``, called after the call
     with the resolved model, the caller and the outcome. Without it, nothing is recorded
     unless a logger was installed (:func:`set_call_logger`) or ``AIX_CALL_LOG`` is set.
     ``default_model`` returns the model the function uses when it is given none (read
-    from the active config at call time). A lazy result (a generator, or the iterator a
+    from the active config at call time); ``model_of(arguments)``, when given, names the
+    model from the call's bound arguments instead (``None``: fall back to the above). The
+    model is resolved when the call is made. A lazy result (a generator, or the iterator a
     ``stream=True`` call returns) is recorded when it ends, so an error raised while it
-    is consumed is logged as a failure.
+    is consumed is logged as a failure; it stays a generator (``send``, ``throw`` and
+    ``close`` pass through). A model call made from inside a logger is not logged.
 
     >>> @logged("echo")
     ... def echo(x, *, model=None):
@@ -270,10 +279,12 @@ def logged(function: str, *, default_model: Optional[Callable[[], Optional[str]]
 
         @wraps(func)
         def wrapper(*args, on_call=None, **kwargs):
-            if _active(on_call) is None:
+            if _in_logger.get() or _active(on_call) is None:
                 return func(*args, **kwargs)
-            model = _resolved_model(sig, args, kwargs, default_model)
+            model = _resolved_model(sig, args, kwargs, default_model, model_of)
             recording = _start(function, model, on_call)
+            if recording is None:
+                return func(*args, **kwargs)
             try:
                 result = func(*args, **kwargs)
             except BaseException as exc:
@@ -282,7 +293,7 @@ def logged(function: str, *, default_model: Optional[Callable[[], Optional[str]]
             if inspect.isgenerator(result) or (
                 kwargs.get("stream") and isinstance(result, Iterator)
             ):
-                return _LoggedStream(result, recording)
+                return _logged_stream(result, recording)
             recording.finish()
             return result
 

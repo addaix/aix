@@ -11,6 +11,7 @@ Python's default filters show it to a script calling aix.
 """
 
 import warnings
+from typing import Optional
 
 from aix._frames import first_external_frame
 
@@ -18,8 +19,12 @@ from aix._frames import first_external_frame
 REMOVAL_VERSION = "0.1.0"
 
 
-def warn_legacy_backend(name: str) -> None:
-    """Emit the ``DeprecationWarning`` for the legacy backend ``name``, at the user's line."""
+def warn_legacy_backend(name: str, *, stacklevel: Optional[int] = None) -> None:
+    """Emit the ``DeprecationWarning`` for the legacy backend ``name``, at the user's line.
+
+    ``stacklevel`` is accepted for compatibility and ignored: the warning is always
+    attributed to the first frame outside aix.
+    """
     _, stacklevel = first_external_frame()
     warnings.warn(
         f"the legacy aix.gen_ai {name!r} chat backend is deprecated and will be "

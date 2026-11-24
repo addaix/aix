@@ -309,7 +309,10 @@ def text_to_speech(
 
 
 @_logged(
-    "transcribe", default_model=lambda: _get_config().audio.transcription_model
+    "transcribe",
+    default_model=lambda: _get_config().audio.transcription_model,
+    # a scribed engine bypasses litellm: record the model as given, else the engine
+    model_of=lambda a: (a.get("model") or a["engine"]) if a.get("engine") else None,
 )
 def transcribe(
     audio: Union[str, Path, BinaryIO, bytes],

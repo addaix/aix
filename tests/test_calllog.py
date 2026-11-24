@@ -86,7 +86,9 @@ def test_a_broken_logger_never_breaks_the_call():
 
 def _here(records):
     """The callers of ``records``, reduced to this test file's name (or the full path)."""
-    return [r.caller.rsplit("/", 1)[-1].split(":")[0] for r in records]
+    import os
+
+    return [os.path.basename(r.caller.rsplit(":", 1)[0]) for r in records]
 
 
 def test_calls_on_aix_worker_pools_record_the_user_line():
@@ -186,3 +188,78 @@ def test_audio_calls_are_logged_once(monkeypatch):
         ("transcribe", "openai/whisper-1", True),
     ]
     assert set(_here(records)) == {"test_calllog.py"}
+
+
+def test_a_logged_lazy_result_stays_a_generator(monkeypatch):
+    """Turning the log on must not change what a call returns."""
+    import inspect
+    import types
+
+    embeddings_module = importlib.import_module("aix.embeddings")
+    response = types.SimpleNamespace(data=[{"embedding": [0.1]}])
+    monkeypatch.setattr(embeddings_module, "_embedding", lambda: lambda **kw: response)
+    off = aix.embeddings(["x"], model="openai/text-embedding-3-small")
+    with aix.call_logger(lambda r: None):
+        on = aix.embeddings(["x"], model="openai/text-embedding-3-small")
+    assert inspect.isgenerator(off) and inspect.isgenerator(on)
+    assert on.send(None) == off.send(None) == [0.1]
+
+
+def test_closing_a_logged_stream_propagates_the_streams_cleanup_error():
+    from aix.calllog import logged
+
+    def gen():
+        try:
+            yield 1
+            yield 2
+        finally:
+            raise RuntimeError("cleanup failed")
+
+    @logged("g")
+    def make(*, model=None):
+        return gen()
+
+    records = []
+    stream = make(model="m", on_call=records.append)
+    next(stream)
+    with pytest.raises(RuntimeError, match="cleanup failed"):
+        stream.close()
+    assert [(r.ok, r.error) for r in records] == [(False, "RuntimeError: cleanup failed")]
+
+
+def test_a_logger_calling_aix_is_not_logged_again():
+    records = []
+
+    def logger(record):
+        records.append(record)
+        aix.chat("summarise the record", model="openai/gpt-4o-mini")  # no recursion
+
+    aix.chat("hello", model="openai/gpt-4o-mini", on_call=logger)
+    assert len(records) == 1
+
+
+def test_submitting_to_a_pool_never_fails_on_caller_attribution(monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+
+    from aix import calllog
+    from aix.config import submit_in_context
+
+    def broken():
+        raise FileNotFoundError("cwd is gone")
+
+    monkeypatch.setattr(calllog, "_caller", broken)
+    with ThreadPoolExecutor(1) as pool:
+        assert submit_in_context(pool, lambda x: 2 * x, 3).result() == 6
+
+
+def test_model_of_names_the_model_from_the_arguments():
+    from aix.calllog import logged
+
+    @logged("t", default_model=lambda: "default", model_of=lambda a: a.get("engine"))
+    def transcribe_like(audio, *, engine=None, model=None):
+        return "text"
+
+    records = []
+    transcribe_like(b"", engine="deepgram", on_call=records.append)
+    transcribe_like(b"", model="openai/whisper-1", on_call=records.append)
+    assert [r.model for r in records] == ["deepgram", "openai/whisper-1"]
