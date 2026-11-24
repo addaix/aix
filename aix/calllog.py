@@ -210,9 +210,30 @@ def _logged_stream(stream: Iterator, recording: _Recording):
     """Yield from ``stream`` and send the record when it ends.
 
     Exhausted: ok. Raised: the error. Closed early or dropped (``close()``, or garbage
-    collection of an unfinished stream): ok, at that moment. It is a generator, so
-    ``send``, ``throw`` and ``close`` reach ``stream`` as they would without logging.
+    collection of an unfinished stream), before or after its first item: ok, at that
+    moment. It is a generator, so ``send``, ``throw`` and ``close`` reach ``stream`` as
+    they would without logging.
+
+    The generator returned is already started (see :func:`_started_logged_stream`):
+    closing or collecting a generator that never ran skips its body, and the request
+    was sent when the stream opened, so a stream nobody read must still be recorded.
     """
+    try:
+        yield  # the priming step: from here on, close() and collection run the handlers
+    except GeneratorExit:
+        # Closed before its first item: ``stream`` was never delegated to, so close it.
+        try:
+            close = getattr(stream, "close", None)
+            if close is not None:
+                close()
+        except BaseException as exc:
+            recording.finish(exc)
+            raise
+        recording.finish()
+        raise
+    except BaseException as exc:  # thrown in before the first item
+        recording.finish(exc)
+        raise
     try:
         result = yield from stream
     except GeneratorExit:
@@ -223,6 +244,13 @@ def _logged_stream(stream: Iterator, recording: _Recording):
         raise
     recording.finish()
     return result
+
+
+def _started_logged_stream(stream: Iterator, recording: _Recording):
+    """:func:`_logged_stream`, advanced past its priming step (``stream`` is untouched)."""
+    logged_stream = _logged_stream(stream, recording)
+    next(logged_stream)
+    return logged_stream
 
 
 def _resolved_model(sig, args, kwargs, default_model, model_of) -> Optional[str]:
@@ -261,7 +289,8 @@ def logged(
     model from the call's bound arguments instead (``None``: fall back to the above). The
     model is resolved when the call is made. A lazy result (a generator, or the iterator a
     ``stream=True`` call returns) is recorded when it ends, so an error raised while it
-    is consumed is logged as a failure; it stays a generator (``send``, ``throw`` and
+    is consumed is logged as a failure, and one closed or dropped unread is still logged;
+    it stays a generator (``send``, ``throw`` and
     ``close`` pass through). A model call made from inside a logger is not logged.
 
     >>> @logged("echo")
@@ -293,7 +322,7 @@ def logged(
             if inspect.isgenerator(result) or (
                 kwargs.get("stream") and isinstance(result, Iterator)
             ):
-                return _logged_stream(result, recording)
+                return _started_logged_stream(result, recording)
             recording.finish()
             return result
 
