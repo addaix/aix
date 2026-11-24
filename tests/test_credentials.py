@@ -205,3 +205,31 @@ class TestKeylessLocalModels:
         mock_completion.return_value = resp
         assert _aix_chat.chat("hi", model="ollama/mistral:7b") == "hi"
         assert "api_key" not in mock_completion.call_args[1]
+
+
+class TestCheckRequirementsResolvesAliases:
+    """The preflight checks the model actually called, not the alias (#104)."""
+
+    def test_alias_to_a_keyed_model(self, no_keys, monkeypatch):
+        import aix
+
+        with aix.using(aliases={"seer": "gpt-4o"}):
+            with pytest.raises(MissingCredentialError):
+                check_requirements("seer")
+            monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+            assert check_requirements("seer") is True
+
+    def test_alias_to_a_keyless_model(self, no_keys):
+        import aix
+
+        with aix.using(aliases={"local": "ollama/mistral"}):
+            assert check_requirements("local") is True
+
+    def test_claude_cli_needs_the_cli_not_a_key(self, no_keys, monkeypatch):
+        import aix.claude_cli
+
+        monkeypatch.setattr(aix.claude_cli.shutil, "which", lambda name: "/bin/claude")
+        assert check_requirements("claude-cli/haiku") is True
+        monkeypatch.setattr(aix.claude_cli.shutil, "which", lambda name: None)
+        with pytest.raises(RuntimeError, match="Claude Code CLI"):
+            check_requirements("claude-cli/haiku")

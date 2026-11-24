@@ -452,6 +452,10 @@ def check_requirements(
     via :func:`resolve_api_key` (explicit arg, env/.env, or store). Raises
     :class:`MissingCredentialError` with actionable guidance when absent.
 
+    A model alias (``"fast"``, ``"best"``, a configured one) is resolved first, so
+    the model actually called is the one checked. A ``claude-cli/...`` model needs
+    no key, only the ``claude`` CLI on the PATH (``RuntimeError`` otherwise).
+
     Returns ``True`` when a key is available, or when the model is local and
     needs none (:func:`is_keyless`, e.g. ``ollama/...``).
 
@@ -461,6 +465,12 @@ def check_requirements(
         >>> check_requirements("ollama/mistral")
         True
     """
+    from aix.claude_cli import check_claude_cli, is_claude_cli_model
+    from aix.config import resolve_model
+
+    model_or_provider = resolve_model(model_or_provider)
+    if is_claude_cli_model(model_or_provider):  # the CLI carries the login
+        return check_claude_cli()
     if is_keyless(model_or_provider):
         return True
     if resolve_api_key(model_or_provider, api_key=api_key) is not None:
@@ -493,16 +503,11 @@ def requires_credentials(default_model: Callable[[], Optional[str]]):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
-            # Resolve aliases ("best", "fast", configured ones) first: the
-            # preflight must check the provider of the model actually called.
-            from aix.config import resolve_model
-
-            model = resolve_model(kwargs.get("model") or default_model())
-            from aix.claude_cli import check_claude_cli, is_claude_cli_model
-
-            if is_claude_cli_model(model):  # no API key: the CLI carries the login
-                check_claude_cli()
-                return func(*args, **kwargs)
+            # check_requirements resolves aliases ("best", "fast", configured
+            # ones) and claude-cli models itself, so every entry point (this
+            # decorator, aix.sample, a direct call) checks the model actually
+            # called.
+            model = kwargs.get("model") or default_model()
             check_requirements(model, api_key=kwargs.get("api_key"))
             return func(*args, **kwargs)
 
