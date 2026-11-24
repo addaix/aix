@@ -913,7 +913,9 @@
 
 <div class="viewcode-block" id="translate_audio">
 <a class="viewcode-back" href="../../_autosummary/aix.audio.html#aix.translate_audio">[docs]</a>
-<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"translate_audio"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">transcription_model</span><span class="p">)</span>
+<span class="nd">@_logged</span><span class="p">(</span>
+    <span class="s2">"translate_audio"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">transcription_model</span>
+<span class="p">)</span>
 <span class="nd">@_requires_credentials</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">transcription_model</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">translate_audio</span><span class="p">(</span>
     <span class="n">audio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span>
@@ -1025,7 +1027,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=e1e30c64"></script>
+</div><script src="../../_static/documentation_options.js?v=c152968f"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
