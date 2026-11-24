@@ -279,8 +279,19 @@
 <span class="sd">- from the environment, ``AIX_CALL_LOG=/path/to/calls.jsonl`` writes one JSON line per</span>
 <span class="sd">  call with :func:`jsonl_logger` (the prompt and the reply are never recorded).</span>
 
-<span class="sd">A logger is any ``fn(record: CallRecord) -&gt; None``. It runs after the call, and an</span>
-<span class="sd">exception inside it is swallowed so logging can never break a model call.</span>
+<span class="sd">A logger is any ``fn(record: CallRecord) -&gt; None``. It runs after the call (for a stream,</span>
+<span class="sd">when the stream ends), and an exception inside it is swallowed so logging can never break</span>
+<span class="sd">a model call.</span>
+
+<span class="sd">Logged entry points: ``chat``, ``complete`` (and what is built on them: ``sample``,</span>
+<span class="sd">``batch_chat``, prompt functions...), ``describe_image``, ``compare_images``,</span>
+<span class="sd">``embeddings`` / ``embed``, ``generate_image`` / ``generate_images`` / ``edit_image`` /</span>
+<span class="sd">``create_variation``, ``text_to_speech``, ``transcribe`` (and</span>
+<span class="sd">``transcribe_with_timestamps``) and ``translate_audio``. A call made on one of aix's own</span>
+<span class="sd">worker pools records the line that called aix, not the pool's thread; one handed</span>
+<span class="sd">straight to a thread or pool of your own (``pool.submit(aix.chat, ...)``) records ``"?"``</span>
+<span class="sd">(and is only logged there if the logger reaches that thread: ``AIX_CALL_LOG``, or a</span>
+<span class="sd">copied context).</span>
 
 <span class="sd">&gt;&gt;&gt; seen = []</span>
 <span class="sd">&gt;&gt;&gt; with call_logger(seen.append):</span>
@@ -294,13 +305,17 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">contextvars</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterator</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">wraps</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">aix._frames</span><span class="w"> </span><span class="kn">import</span> <span class="n">first_external_frame</span><span class="p">,</span> <span class="n">is_thread_machinery</span><span class="p">,</span> <span class="n">where</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"CallRecord"</span><span class="p">,</span> <span class="s2">"set_call_logger"</span><span class="p">,</span> <span class="s2">"call_logger"</span><span class="p">,</span> <span class="s2">"jsonl_logger"</span><span class="p">,</span> <span class="s2">"ENV_VAR"</span><span class="p">]</span>
 
@@ -374,45 +389,199 @@
     <span class="k">return</span> <span class="n">jsonl_logger</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">if</span> <span class="n">path</span> <span class="k">else</span> <span class="kc">None</span>
 
 
+<span class="c1">#: The aix caller of the code submitting to one of aix's own worker pools (``batch_chat``,</span>
+<span class="c1">#: ``sample(concurrency=...)``), carried into the worker through the copied context: in the</span>
+<span class="c1">#: worker thread the stack above aix is the pool's machinery, not the user's code.</span>
+<span class="n">_submitter</span><span class="p">:</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">ContextVar</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">ContextVar</span><span class="p">(</span>
+    <span class="s2">"aix_call_submitter"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span>
+<span class="p">)</span>
+
+<span class="c1">#: Set while a logger runs: a model call made by a logger is not logged (no recursion).</span>
+<span class="n">_in_logger</span><span class="p">:</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">ContextVar</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">ContextVar</span><span class="p">(</span>
+    <span class="s2">"aix_in_call_logger"</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_caller</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""``file:line`` of the first frame outside the aix package."""</span>
-    <span class="n">package</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
-    <span class="n">frame</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">while</span> <span class="n">frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">frame</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_filename</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">package</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">"contextlib"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">frame</span><span class="o">.</span><span class="n">f_lineno</span><span class="si">}</span><span class="s2">"</span>
-        <span class="n">frame</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">f_back</span>
-    <span class="k">return</span> <span class="s2">"?"</span>
+<span class="w">    </span><span class="sd">"""``file:line`` of the first frame outside the aix package.</span>
+
+<span class="sd">    In a worker of one of aix's own pools (or anything submitted through</span>
+<span class="sd">    :func:`aix.config.submit_in_context`), where the first outside frame is the pool's</span>
+<span class="sd">    thread machinery, it is the line that called aix in the submitting thread. A call</span>
+<span class="sd">    handed straight to a thread or pool of your own (``pool.submit(aix.chat, ...)``) has</span>
+<span class="sd">    no line of yours on its stack: its caller is ``"?"``.</span>
+<span class="sd">    """</span>
+    <span class="n">frame</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">first_external_frame</span><span class="p">(</span><span class="n">skip</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">frame</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">is_thread_machinery</span><span class="p">(</span><span class="n">frame</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_submitter</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="ow">or</span> <span class="s2">"?"</span>
+    <span class="k">return</span> <span class="n">where</span><span class="p">(</span><span class="n">frame</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">carry_caller</span><span class="p">(</span><span class="n">context</span><span class="p">:</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">Context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">contextvars</span><span class="o">.</span><span class="n">Context</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Store the current caller in ``context``, a copy to run on another thread.</span>
+
+<span class="sd">    aix's pools call this (through :func:`aix.config.submit_in_context`) in the submitting</span>
+<span class="sd">    thread, so a call made in the worker is logged with the user's line. It never fails:</span>
+<span class="sd">    on any error the context is returned as it is.</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">caller</span> <span class="o">=</span> <span class="n">_caller</span><span class="p">()</span>
+        <span class="n">context</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">_submitter</span><span class="o">.</span><span class="n">set</span><span class="p">,</span> <span class="n">caller</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - attribution must never break a submit</span>
+        <span class="k">pass</span>
+    <span class="k">return</span> <span class="n">context</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_Recording</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""One call being recorded: :meth:`finish` sends its record, once (thread-safe)."""</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">logger</span><span class="p">:</span> <span class="n">CallLogger</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">function</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">caller</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="n">_caller</span><span class="p">(),</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">(),</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">finish</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="ne">BaseException</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">done</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">done</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">exc</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">_in_logger</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">(</span>
+                <span class="n">CallRecord</span><span class="p">(</span>
+                    <span class="n">function</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">function</span><span class="p">,</span>
+                    <span class="n">model</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                    <span class="n">caller</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">caller</span><span class="p">,</span>
+                    <span class="n">ok</span><span class="o">=</span><span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="n">seconds</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                    <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span>
+                    <span class="n">time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - logging can never break a model call</span>
+            <span class="k">pass</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">_in_logger</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_start</span><span class="p">(</span>
+    <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">explicit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CallLogger</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">_Recording</span><span class="p">]:</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">_in_logger</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">else</span> <span class="n">_active</span><span class="p">(</span><span class="n">explicit</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_Recording</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
 
 
 <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_record</span><span class="p">(</span><span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">explicit</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CallLogger</span><span class="p">]):</span>
 <span class="w">    </span><span class="sd">"""Record the call made inside the block to the active logger, if any."""</span>
-    <span class="n">logger</span> <span class="o">=</span> <span class="n">_active</span><span class="p">(</span><span class="n">explicit</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">recording</span> <span class="o">=</span> <span class="n">_start</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">explicit</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">recording</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">yield</span>
         <span class="k">return</span>
-    <span class="n">caller</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">now</span> <span class="o">=</span> <span class="n">_caller</span><span class="p">(),</span> <span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">(),</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">yield</span>
     <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-        <span class="n">error</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">exc</span><span class="si">}</span><span class="s2">"</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
         <span class="k">raise</span>
-    <span class="k">finally</span><span class="p">:</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_logged_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">recording</span><span class="p">:</span> <span class="n">_Recording</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Yield from ``stream`` and send the record when it ends.</span>
+
+<span class="sd">    Exhausted: ok. Raised: the error. Closed early or dropped (``close()``, or garbage</span>
+<span class="sd">    collection of an unfinished stream): ok, at that moment. It is a generator, so</span>
+<span class="sd">    ``send``, ``throw`` and ``close`` reach ``stream`` as they would without logging.</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">stream</span>
+    <span class="k">except</span> <span class="ne">GeneratorExit</span><span class="p">:</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_resolved_model</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">default_model</span><span class="p">,</span> <span class="n">model_of</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The model a call will use: its ``model`` argument or the default, alias-resolved."""</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">arguments</span> <span class="o">=</span> <span class="n">sig</span><span class="o">.</span><span class="n">bind_partial</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">arguments</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="n">arguments</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">model_of</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-            <span class="n">logger</span><span class="p">(</span>
-                <span class="n">CallRecord</span><span class="p">(</span>
-                    <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
-                    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-                    <span class="n">caller</span><span class="o">=</span><span class="n">caller</span><span class="p">,</span>
-                    <span class="n">ok</span><span class="o">=</span><span class="n">error</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">,</span>
-                    <span class="n">seconds</span><span class="o">=</span><span class="nb">round</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">perf_counter</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-                    <span class="n">error</span><span class="o">=</span><span class="n">error</span><span class="p">,</span>
-                    <span class="n">time</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">)</span>
+            <span class="n">chosen</span> <span class="o">=</span> <span class="n">model_of</span><span class="p">(</span><span class="n">arguments</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">chosen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">chosen</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">aix.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_model</span>
+
+        <span class="k">return</span> <span class="n">resolve_model</span><span class="p">(</span><span class="n">model</span> <span class="ow">or</span> <span class="p">(</span><span class="n">default_model</span><span class="p">()</span> <span class="k">if</span> <span class="n">default_model</span> <span class="k">else</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - never let logging break a call</span>
+        <span class="k">return</span> <span class="n">model</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">logged</span><span class="p">(</span>
+    <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">default_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">model_of</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Decorator: record each call of an aix entry point to the opt-in call log.</span>
+
+<span class="sd">    Adds the keyword-only ``on_call=`` seam: ``fn(CallRecord)``, called after the call</span>
+<span class="sd">    with the resolved model, the caller and the outcome. Without it, nothing is recorded</span>
+<span class="sd">    unless a logger was installed (:func:`set_call_logger`) or ``AIX_CALL_LOG`` is set.</span>
+<span class="sd">    ``default_model`` returns the model the function uses when it is given none (read</span>
+<span class="sd">    from the active config at call time); ``model_of(arguments)``, when given, names the</span>
+<span class="sd">    model from the call's bound arguments instead (``None``: fall back to the above). The</span>
+<span class="sd">    model is resolved when the call is made. A lazy result (a generator, or the iterator a</span>
+<span class="sd">    ``stream=True`` call returns) is recorded when it ends, so an error raised while it</span>
+<span class="sd">    is consumed is logged as a failure; it stays a generator (``send``, ``throw`` and</span>
+<span class="sd">    ``close`` pass through). A model call made from inside a logger is not logged.</span>
+
+<span class="sd">    &gt;&gt;&gt; @logged("echo")</span>
+<span class="sd">    ... def echo(x, *, model=None):</span>
+<span class="sd">    ...     return x</span>
+<span class="sd">    &gt;&gt;&gt; seen = []</span>
+<span class="sd">    &gt;&gt;&gt; echo("hi", model="gpt-x", on_call=seen.append)</span>
+<span class="sd">    'hi'</span>
+<span class="sd">    &gt;&gt;&gt; seen[0].function, seen[0].model, seen[0].ok</span>
+<span class="sd">    ('echo', 'gpt-x', True)</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">decorate</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+        <span class="n">sig</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+
+        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">on_call</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">_in_logger</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="ow">or</span> <span class="n">_active</span><span class="p">(</span><span class="n">on_call</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">_resolved_model</span><span class="p">(</span><span class="n">sig</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">,</span> <span class="n">default_model</span><span class="p">,</span> <span class="n">model_of</span><span class="p">)</span>
+            <span class="n">recording</span> <span class="o">=</span> <span class="n">_start</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">on_call</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">recording</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+                <span class="k">raise</span>
+            <span class="k">if</span> <span class="n">inspect</span><span class="o">.</span><span class="n">isgenerator</span><span class="p">(</span><span class="n">result</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"stream"</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">_logged_stream</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">recording</span><span class="p">)</span>
+            <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">return</span> <span class="n">wrapper</span>
+
+    <span class="k">return</span> <span class="n">decorate</span>
 </pre></div>
         </article>
       </div>
@@ -441,7 +610,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=48a37802"></script>
+</div><script src="../../_static/documentation_options.js?v=e1e30c64"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

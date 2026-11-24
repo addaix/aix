@@ -329,7 +329,7 @@
     <span class="n">requires_credentials</span> <span class="k">as</span> <span class="n">_requires_credentials</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">aix.calllog</span><span class="w"> </span><span class="kn">import</span> <span class="n">_record</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">aix.calllog</span><span class="w"> </span><span class="kn">import</span> <span class="n">logged</span> <span class="k">as</span> <span class="n">_logged</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">aix._litellm</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNRESOLVED</span> <span class="k">as</span> <span class="n">_UNRESOLVED</span><span class="p">,</span> <span class="n">litellm_attr</span> <span class="k">as</span> <span class="n">_litellm_attr</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">aix.structured</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">ResponseSchema</span> <span class="k">as</span> <span class="n">_ResponseSchema</span><span class="p">,</span>
@@ -781,33 +781,9 @@
     <span class="k">return</span> <span class="n">kwargs</span>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_logged</span><span class="p">(</span><span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Record each call of ``chat``/``complete`` to the opt-in call log (:mod:`aix.calllog`).</span>
-
-<span class="sd">    Adds the keyword-only ``on_call=`` seam: ``fn(CallRecord)``, called after the call with</span>
-<span class="sd">    the resolved model, the caller, and the outcome. Without it, nothing is recorded unless</span>
-<span class="sd">    a logger was installed (``set_call_logger``) or ``AIX_CALL_LOG`` is set. For a streaming</span>
-<span class="sd">    ``chat`` the record covers the call that opens the stream.</span>
-<span class="sd">    """</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">decorate</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
-        <span class="nd">@wraps</span><span class="p">(</span><span class="n">func</span><span class="p">)</span>
-        <span class="k">def</span><span class="w"> </span><span class="nf">wrapper</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">on_call</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">model</span> <span class="o">=</span> <span class="n">_resolve_model</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># noqa: BLE001 - never let logging break a call</span>
-                <span class="n">model</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span>
-            <span class="k">with</span> <span class="n">_record</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">on_call</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">wrapper</span>
-
-    <span class="k">return</span> <span class="n">decorate</span>
-
-
 <div class="viewcode-block" id="chat">
 <a class="viewcode-back" href="../../_autosummary/aix.html#aix.chat">[docs]</a>
-<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"chat"</span><span class="p">)</span>
+<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"chat"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 <span class="nd">@_requires_credentials</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span>
     <span class="n">prompt</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">dict</span><span class="p">]],</span>
@@ -946,7 +922,7 @@
 
 <div class="viewcode-block" id="complete">
 <a class="viewcode-back" href="../../_autosummary/aix.html#aix.complete">[docs]</a>
-<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"complete"</span><span class="p">)</span>
+<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"complete"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 <span class="nd">@_validate_complete_args</span>
 <span class="nd">@_requires_credentials</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">chat</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">complete</span><span class="p">(</span>
@@ -1339,7 +1315,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=48a37802"></script>
+</div><script src="../../_static/documentation_options.js?v=e1e30c64"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

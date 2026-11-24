@@ -290,6 +290,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">mimetypes</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">aix.calllog</span><span class="w"> </span><span class="kn">import</span> <span class="n">logged</span> <span class="k">as</span> <span class="n">_logged</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">aix._litellm</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNRESOLVED</span> <span class="k">as</span> <span class="n">_UNRESOLVED</span><span class="p">,</span> <span class="n">litellm_attr</span> <span class="k">as</span> <span class="n">_litellm_attr</span>
 
 <span class="c1"># LiteLLM is deferred: importing it fetches litellm's model-cost map over</span>
@@ -502,6 +503,7 @@
 
 <div class="viewcode-block" id="text_to_speech">
 <a class="viewcode-back" href="../../_autosummary/aix.audio.html#aix.text_to_speech">[docs]</a>
+<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"text_to_speech"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">tts_model</span><span class="p">)</span>
 <span class="nd">@_requires_credentials</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">tts_model</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">text_to_speech</span><span class="p">(</span>
     <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -596,6 +598,12 @@
 
 <div class="viewcode-block" id="transcribe">
 <a class="viewcode-back" href="../../_autosummary/aix.audio.html#aix.transcribe">[docs]</a>
+<span class="nd">@_logged</span><span class="p">(</span>
+    <span class="s2">"transcribe"</span><span class="p">,</span>
+    <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">transcription_model</span><span class="p">,</span>
+    <span class="c1"># a scribed engine bypasses litellm: record the model as given, else the engine</span>
+    <span class="n">model_of</span><span class="o">=</span><span class="k">lambda</span> <span class="n">a</span><span class="p">:</span> <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"model"</span><span class="p">)</span> <span class="ow">or</span> <span class="n">a</span><span class="p">[</span><span class="s2">"engine"</span><span class="p">])</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"engine"</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">transcribe</span><span class="p">(</span>
     <span class="n">audio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span>
     <span class="o">*</span><span class="p">,</span>
@@ -905,6 +913,7 @@
 
 <div class="viewcode-block" id="translate_audio">
 <a class="viewcode-back" href="../../_autosummary/aix.audio.html#aix.translate_audio">[docs]</a>
+<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"translate_audio"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">transcription_model</span><span class="p">)</span>
 <span class="nd">@_requires_credentials</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">audio</span><span class="o">.</span><span class="n">transcription_model</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">translate_audio</span><span class="p">(</span>
     <span class="n">audio</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">BinaryIO</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">],</span>
@@ -1016,7 +1025,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=48a37802"></script>
+</div><script src="../../_static/documentation_options.js?v=e1e30c64"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

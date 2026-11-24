@@ -11,8 +11,19 @@ have not asked to see it. Three ways to turn it on, from narrowest to widest:
 - from the environment, `AIX_CALL_LOG=/path/to/calls.jsonl` writes one JSON line per
   call with [`jsonl_logger()`](#aix.calllog.jsonl_logger) (the prompt and the reply are never recorded).
 
-A logger is any `fn(record: CallRecord) -> None`. It runs after the call, and an
-exception inside it is swallowed so logging can never break a model call.
+A logger is any `fn(record: CallRecord) -> None`. It runs after the call (for a stream,
+when the stream ends), and an exception inside it is swallowed so logging can never break
+a model call.
+
+Logged entry points: `chat`, `complete` (and what is built on them: `sample`,
+`batch_chat`, prompt functions…), `describe_image`, `compare_images`,
+`embeddings` / `embed`, `generate_image` / `generate_images` / `edit_image` /
+`create_variation`, `text_to_speech`, `transcribe` (and
+`transcribe_with_timestamps`) and `translate_audio`. A call made on one of aix’s own
+worker pools records the line that called aix, not the pool’s thread; one handed
+straight to a thread or pool of your own (`pool.submit(aix.chat, ...)`) records `"?"`
+(and is only logged there if the logger reaches that thread: `AIX_CALL_LOG`, or a
+copied context).
 
 ```pycon
 >>> seen = []

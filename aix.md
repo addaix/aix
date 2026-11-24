@@ -1,4 +1,4 @@
-> built 2026-11-23 23:00 UTC from 1af3765 (master) · aix 0.0.64. Details: build_info.json
+> built 2026-11-24 01:48 UTC from f60d46e (master) · aix 0.0.65. Details: build_info.json
 
 # index.html.md
 
@@ -2590,8 +2590,19 @@ have not asked to see it. Three ways to turn it on, from narrowest to widest:
 - from the environment, `AIX_CALL_LOG=/path/to/calls.jsonl` writes one JSON line per
   call with [`jsonl_logger()`](_autosummary/aix.calllog.html.md#aix.calllog.jsonl_logger) (the prompt and the reply are never recorded).
 
-A logger is any `fn(record: CallRecord) -> None`. It runs after the call, and an
-exception inside it is swallowed so logging can never break a model call.
+A logger is any `fn(record: CallRecord) -> None`. It runs after the call (for a stream,
+when the stream ends), and an exception inside it is swallowed so logging can never break
+a model call.
+
+Logged entry points: `chat`, `complete` (and what is built on them: `sample`,
+`batch_chat`, prompt functions…), `describe_image`, `compare_images`,
+`embeddings` / `embed`, `generate_image` / `generate_images` / `edit_image` /
+`create_variation`, `text_to_speech`, `transcribe` (and
+`transcribe_with_timestamps`) and `translate_audio`. A call made on one of aix’s own
+worker pools records the line that called aix, not the pool’s thread; one handed
+straight to a thread or pool of your own (`pool.submit(aix.chat, ...)`) records `"?"`
+(and is only logged there if the logger reaches that thread: `AIX_CALL_LOG`, or a
+copied context).
 
 ```pycon
 >>> seen = []
@@ -8319,7 +8330,7 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-23 23:00 UTC** from commit <a href="https://github.com/addaix/aix/commit/1af3765dd93637f6c0da70d3e269062597cc9c37"><code>1af3765</code></a> on branch <code>master</code>, for **aix 0.0.64** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-24 01:48 UTC** from commit <a href="https://github.com/addaix/aix/commit/f60d46ee6473d12e94a03a3f32ce4a072fbcaa79"><code>f60d46e</code></a> on branch <code>master</code>, for **aix 0.0.65** (from <code>pyproject.toml</code>).
 
 #### NOTE
 Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
@@ -8328,7 +8339,7 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/1af3765dd93637f6c0da70d3e269062597cc9c37"><code>1af3765dd93637f6c0da70d3e269062597cc9c37</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/f60d46ee6473d12e94a03a3f32ce4a072fbcaa79"><code>f60d46ee6473d12e94a03a3f32ce4a072fbcaa79</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -8339,9 +8350,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45284593335">45284593335</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45307424908">45307424908</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>1af3765dd93637f6c0da70d3e269062597cc9c37</code> (in the history of the built commit) |
+| Event commit | <code>f60d46ee6473d12e94a03a3f32ce4a072fbcaa79</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8366,13 +8377,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.64/">0.0.64</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/aix/0.0.65/">0.0.65</a>, the same as the documented version.
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 1af3765dd93637f6c0da70d3e269062597cc9c37
+git checkout f60d46ee6473d12e94a03a3f32ce4a072fbcaa79
 pip install "epythet==0.2.25"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

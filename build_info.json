@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-23T23:00:15Z",
+  "built_at": "2026-11-24T01:48:24Z",
   "package": {
     "name": "aix",
-    "version": "0.0.64",
+    "version": "0.0.65",
     "display_name": "aix",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "1af3765dd93637f6c0da70d3e269062597cc9c37",
-    "short_commit": "1af3765",
+    "commit": "f60d46ee6473d12e94a03a3f32ce4a072fbcaa79",
+    "short_commit": "f60d46e",
     "branch": "master",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/addaix/aix",
-    "commit_url": "https://github.com/addaix/aix/commit/1af3765dd93637f6c0da70d3e269062597cc9c37",
+    "commit_url": "https://github.com/addaix/aix/commit/f60d46ee6473d12e94a03a3f32ce4a072fbcaa79",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "addaix/aix",
-    "sha": "1af3765dd93637f6c0da70d3e269062597cc9c37",
+    "sha": "f60d46ee6473d12e94a03a3f32ce4a072fbcaa79",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "45284593335",
-    "run_url": "https://github.com/addaix/aix/actions/runs/45284593335",
+    "run_id": "45307424908",
+    "run_url": "https://github.com/addaix/aix/actions/runs/45307424908",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,11 +60,11 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.64",
+    "latest": "0.0.65",
     "relation": "same",
     "error": null
   },
-  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout 1af3765dd93637f6c0da70d3e269062597cc9c37\npip install \"epythet==0.2.25\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout f60d46ee6473d12e94a03a3f32ce4a072fbcaa79\npip install \"epythet==0.2.25\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
     "aligned": true,

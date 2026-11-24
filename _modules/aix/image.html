@@ -300,6 +300,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">io</span><span class="w"> </span><span class="kn">import</span> <span class="n">BytesIO</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">aix.calllog</span><span class="w"> </span><span class="kn">import</span> <span class="n">logged</span> <span class="k">as</span> <span class="n">_logged</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">aix._litellm</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNRESOLVED</span> <span class="k">as</span> <span class="n">_UNRESOLVED</span><span class="p">,</span> <span class="n">litellm_attr</span> <span class="k">as</span> <span class="n">_litellm_attr</span>
 
 <span class="c1"># LiteLLM is deferred: importing it fetches litellm's model-cost map over</span>
@@ -482,6 +483,7 @@
 
 <div class="viewcode-block" id="generate_image">
 <a class="viewcode-back" href="../../_autosummary/aix.image.html#aix.generate_image">[docs]</a>
+<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"generate_image"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 <span class="nd">@_requires_credentials</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">generate_image</span><span class="p">(</span>
     <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -586,6 +588,7 @@
 
 <div class="viewcode-block" id="generate_images">
 <a class="viewcode-back" href="../../_autosummary/aix.image.html#aix.generate_images">[docs]</a>
+<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"generate_images"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 <span class="nd">@_requires_credentials</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">generate_images</span><span class="p">(</span>
     <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -682,6 +685,7 @@
 
 <div class="viewcode-block" id="edit_image">
 <a class="viewcode-back" href="../../_autosummary/aix.image.html#aix.edit_image">[docs]</a>
+<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"edit_image"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">edit_model</span><span class="p">)</span>
 <span class="nd">@_requires_credentials</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">edit_model</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">edit_image</span><span class="p">(</span>
     <span class="n">image_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
@@ -775,6 +779,7 @@
 
 <div class="viewcode-block" id="create_variation">
 <a class="viewcode-back" href="../../_autosummary/aix.image.html#aix.create_variation">[docs]</a>
+<span class="nd">@_logged</span><span class="p">(</span><span class="s2">"create_variation"</span><span class="p">,</span> <span class="n">default_model</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">variation_model</span><span class="p">)</span>
 <span class="nd">@_requires_credentials</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">_get_config</span><span class="p">()</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">variation_model</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">create_variation</span><span class="p">(</span>
     <span class="n">image_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
@@ -879,7 +884,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=48a37802"></script>
+</div><script src="../../_static/documentation_options.js?v=e1e30c64"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

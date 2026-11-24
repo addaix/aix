@@ -288,8 +288,18 @@ have not asked to see it. Three ways to turn it on, from narrowest to widest:</p
 <li><p>from the environment, <code class="docutils literal notranslate"><span class="pre">AIX_CALL_LOG=/path/to/calls.jsonl</span></code> writes one JSON line per
 call with <a class="reference internal" href="#aix.calllog.jsonl_logger" title="aix.calllog.jsonl_logger"><code class="xref py py-func docutils literal notranslate"><span class="pre">jsonl_logger()</span></code></a> (the prompt and the reply are never recorded).</p></li>
 </ul>
-<p>A logger is any <code class="docutils literal notranslate"><span class="pre">fn(record:</span> <span class="pre">CallRecord)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>. It runs after the call, and an
-exception inside it is swallowed so logging can never break a model call.</p>
+<p>A logger is any <code class="docutils literal notranslate"><span class="pre">fn(record:</span> <span class="pre">CallRecord)</span> <span class="pre">-&gt;</span> <span class="pre">None</span></code>. It runs after the call (for a stream,
+when the stream ends), and an exception inside it is swallowed so logging can never break
+a model call.</p>
+<p>Logged entry points: <code class="docutils literal notranslate"><span class="pre">chat</span></code>, <code class="docutils literal notranslate"><span class="pre">complete</span></code> (and what is built on them: <code class="docutils literal notranslate"><span class="pre">sample</span></code>,
+<code class="docutils literal notranslate"><span class="pre">batch_chat</span></code>, prompt functions…), <code class="docutils literal notranslate"><span class="pre">describe_image</span></code>, <code class="docutils literal notranslate"><span class="pre">compare_images</span></code>,
+<code class="docutils literal notranslate"><span class="pre">embeddings</span></code> / <code class="docutils literal notranslate"><span class="pre">embed</span></code>, <code class="docutils literal notranslate"><span class="pre">generate_image</span></code> / <code class="docutils literal notranslate"><span class="pre">generate_images</span></code> / <code class="docutils literal notranslate"><span class="pre">edit_image</span></code> /
+<code class="docutils literal notranslate"><span class="pre">create_variation</span></code>, <code class="docutils literal notranslate"><span class="pre">text_to_speech</span></code>, <code class="docutils literal notranslate"><span class="pre">transcribe</span></code> (and
+<code class="docutils literal notranslate"><span class="pre">transcribe_with_timestamps</span></code>) and <code class="docutils literal notranslate"><span class="pre">translate_audio</span></code>. A call made on one of aix’s own
+worker pools records the line that called aix, not the pool’s thread; one handed
+straight to a thread or pool of your own (<code class="docutils literal notranslate"><span class="pre">pool.submit(aix.chat,</span> <span class="pre">...)</span></code>) records <code class="docutils literal notranslate"><span class="pre">&quot;?&quot;</span></code>
+(and is only logged there if the logger reaches that thread: <code class="docutils literal notranslate"><span class="pre">AIX_CALL_LOG</span></code>, or a
+copied context).</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">seen</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">call_logger</span><span class="p">(</span><span class="n">seen</span><span class="o">.</span><span class="n">append</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="k">with</span> <span class="n">_record</span><span class="p">(</span><span class="s2">"chat"</span><span class="p">,</span> <span class="s2">"gpt-x"</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
@@ -452,7 +462,7 @@ exception inside it is swallowed so logging can never break a model call.</p>
       
     </aside>
   </div>
-</div><script src="../_static/documentation_options.js?v=48a37802"></script>
+</div><script src="../_static/documentation_options.js?v=e1e30c64"></script>
     <script src="../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/scripts/furo.js?v=46bd48cc"></script>
