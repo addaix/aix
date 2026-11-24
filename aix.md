@@ -1,4 +1,4 @@
-> built 2026-11-24 05:09 UTC from 145a9e8 (master) · aix 0.0.67. Details: build_info.json
+> built 2026-11-24 05:58 UTC from fc2c274 (master) · aix 0.0.68. Details: build_info.json
 
 # index.html.md
 
@@ -3233,6 +3233,10 @@ Does *not* validate the key over the network – only that one is discoverable
 via [`resolve_api_key()`](_autosummary/aix.credentials.html.md#aix.credentials.resolve_api_key) (explicit arg, env/.env, or store). Raises
 [`MissingCredentialError`](_autosummary/aix.credentials.html.md#aix.credentials.MissingCredentialError) with actionable guidance when absent.
 
+A model alias (`"fast"`, `"best"`, a configured one) is resolved first, so
+the model actually called is the one checked. A `claude-cli/...` model needs
+no key, only the `claude` CLI on the PATH (`RuntimeError` otherwise).
+
 Returns `True` when a key is available, or when the model is local and
 needs none ([`is_keyless()`](_autosummary/aix.credentials.html.md#aix.credentials.is_keyless), e.g. `ollama/...`).
 
@@ -5121,6 +5125,10 @@ Presence-only preflight: ensure a key for `model_or_provider` is resolvable.
 Does *not* validate the key over the network – only that one is discoverable
 via [`resolve_api_key()`](_autosummary/aix.html.md#aix.resolve_api_key) (explicit arg, env/.env, or store). Raises
 [`MissingCredentialError`](_autosummary/aix.html.md#aix.MissingCredentialError) with actionable guidance when absent.
+
+A model alias (`"fast"`, `"best"`, a configured one) is resolved first, so
+the model actually called is the one checked. A `claude-cli/...` model needs
+no key, only the `claude` CLI on the PATH (`RuntimeError` otherwise).
 
 Returns `True` when a key is available, or when the model is local and
 needs none (`is_keyless()`, e.g. `ollama/...`).
@@ -8330,16 +8338,18 @@ block is the OpenAI/LiteLLM multimodal shape understood across providers.
 
 # About this build
 
-This documentation was built on **2026-11-24 05:09 UTC** from commit <a href="https://github.com/addaix/aix/commit/145a9e8458dd09c93a0fb419fce08cb8cf6dd39a"><code>145a9e8</code></a> on branch <code>master</code>, for **aix 0.0.67** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-24 05:58 UTC** from commit <a href="https://github.com/addaix/aix/commit/fc2c27477fae1acc685f147347c32a64fe8433da"><code>fc2c274</code></a> on branch <code>master</code>, for **aix 0.0.68** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.68) is behind the latest release on PyPI (0.0.69): `pip install aix` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/145a9e8458dd09c93a0fb419fce08cb8cf6dd39a"><code>145a9e8458dd09c93a0fb419fce08cb8cf6dd39a</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/fc2c27477fae1acc685f147347c32a64fe8433da"><code>fc2c27477fae1acc685f147347c32a64fe8433da</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -8350,9 +8360,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45330992330">45330992330</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45336709946">45336709946</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>145a9e8458dd09c93a0fb419fce08cb8cf6dd39a</code> (in the history of the built commit) |
+| Event commit | <code>fc2c27477fae1acc685f147347c32a64fe8433da</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -8377,13 +8387,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.67/">0.0.67</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/aix/0.0.69/">0.0.69</a>, newer than the documented version (0.0.68).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 145a9e8458dd09c93a0fb419fce08cb8cf6dd39a
+git checkout fc2c27477fae1acc685f147347c32a64fe8433da
 pip install "epythet==0.2.25"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

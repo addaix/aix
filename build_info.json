@@ -1,32 +1,32 @@
 {
   "schema_version": 1,
-  "built_at": "2026-11-24T05:09:13Z",
+  "built_at": "2026-11-24T05:58:04Z",
   "package": {
     "name": "aix",
-    "version": "0.0.67",
+    "version": "0.0.68",
     "display_name": "aix",
     "source": "pyproject.toml"
   },
   "git": {
     "available": true,
-    "commit": "145a9e8458dd09c93a0fb419fce08cb8cf6dd39a",
-    "short_commit": "145a9e8",
+    "commit": "fc2c27477fae1acc685f147347c32a64fe8433da",
+    "short_commit": "fc2c274",
     "branch": "master",
     "tags": [],
     "dirty": false,
     "remote_url": "https://github.com/addaix/aix",
-    "commit_url": "https://github.com/addaix/aix/commit/145a9e8458dd09c93a0fb419fce08cb8cf6dd39a",
+    "commit_url": "https://github.com/addaix/aix/commit/fc2c27477fae1acc685f147347c32a64fe8433da",
     "error": null
   },
   "ci": {
     "provider": "github",
     "repository": "addaix/aix",
-    "sha": "145a9e8458dd09c93a0fb419fce08cb8cf6dd39a",
+    "sha": "fc2c27477fae1acc685f147347c32a64fe8433da",
     "sha_in_history": true,
     "ref": "refs/heads/master",
     "ref_name": "master",
-    "run_id": "45330992330",
-    "run_url": "https://github.com/addaix/aix/actions/runs/45330992330",
+    "run_id": "45336709946",
+    "run_url": "https://github.com/addaix/aix/actions/runs/45336709946",
     "server_url": "https://github.com"
   },
   "tools": {
@@ -60,14 +60,16 @@
   },
   "pypi": {
     "checked": true,
-    "latest": "0.0.67",
-    "relation": "same",
+    "latest": "0.0.69",
+    "relation": "behind",
     "error": null
   },
-  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout 145a9e8458dd09c93a0fb419fce08cb8cf6dd39a\npip install \"epythet==0.2.25\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
+  "reproduce": "git clone https://github.com/addaix/aix && cd aix\ngit checkout fc2c27477fae1acc685f147347c32a64fe8433da\npip install \"epythet==0.2.25\"\nepythet quickstart . --ignore tests/ scrap/ examples/",
   "warnings": [],
   "alignment": {
-    "aligned": true,
-    "notes": []
+    "aligned": false,
+    "notes": [
+      "The documented version (0.0.68) is behind the latest release on PyPI (0.0.69): `pip install aix` gives newer code than these docs describe."
+    ]
   }
 }

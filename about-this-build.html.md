@@ -2,16 +2,18 @@
 
 # About this build
 
-This documentation was built on **2026-11-24 05:09 UTC** from commit <a href="https://github.com/addaix/aix/commit/145a9e8458dd09c93a0fb419fce08cb8cf6dd39a"><code>145a9e8</code></a> on branch <code>master</code>, for **aix 0.0.67** (from <code>pyproject.toml</code>).
+This documentation was built on **2026-11-24 05:58 UTC** from commit <a href="https://github.com/addaix/aix/commit/fc2c27477fae1acc685f147347c32a64fe8433da"><code>fc2c274</code></a> on branch <code>master</code>, for **aix 0.0.68** (from <code>pyproject.toml</code>).
 
-#### NOTE
-Nothing suggests a mismatch: the tree was clean at the commit above, and the documented version is the one on PyPI.
+#### WARNING
+The documentation and the package may be misaligned:
+
+- The documented version (0.0.68) is behind the latest release on PyPI (0.0.69): `pip install aix` gives newer code than these docs describe.
 
 ## Source
 
 |                     |                                                                                                                                                   |
 |---------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| Commit              | <a href="https://github.com/addaix/aix/commit/145a9e8458dd09c93a0fb419fce08cb8cf6dd39a"><code>145a9e8458dd09c93a0fb419fce08cb8cf6dd39a</code></a> |
+| Commit              | <a href="https://github.com/addaix/aix/commit/fc2c27477fae1acc685f147347c32a64fe8433da"><code>fc2c27477fae1acc685f147347c32a64fe8433da</code></a> |
 | Branch              | <code>master</code>                                                                                                                               |
 | Tags at this commit | none                                                                                                                                              |
 | Working tree        | clean                                                                                                                                             |
@@ -22,9 +24,9 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 |              |                                                                                            |
 |--------------|--------------------------------------------------------------------------------------------|
 | Repository   | <code>addaix/aix</code>                                                                    |
-| Run          | <a href="https://github.com/addaix/aix/actions/runs/45330992330">45330992330</a>           |
+| Run          | <a href="https://github.com/addaix/aix/actions/runs/45336709946">45336709946</a>           |
 | Ref          | <code>refs/heads/master</code>                                                             |
-| Event commit | <code>145a9e8458dd09c93a0fb419fce08cb8cf6dd39a</code> (in the history of the built commit) |
+| Event commit | <code>fc2c27477fae1acc685f147347c32a64fe8433da</code> (in the history of the built commit) |
 
 ## Tools
 
@@ -49,13 +51,13 @@ Nothing suggests a mismatch: the tree was clean at the commit above, and the doc
 
 ## Package on PyPI
 
-Latest release: <a href="https://pypi.org/project/aix/0.0.67/">0.0.67</a>, the same as the documented version.
+Latest release: <a href="https://pypi.org/project/aix/0.0.69/">0.0.69</a>, newer than the documented version (0.0.68).
 
 ## Reproduce
 
 ```bash
 git clone https://github.com/addaix/aix && cd aix
-git checkout 145a9e8458dd09c93a0fb419fce08cb8cf6dd39a
+git checkout fc2c27477fae1acc685f147347c32a64fe8433da
 pip install "epythet==0.2.25"
 epythet quickstart . --ignore tests/ scrap/ examples/
 ```

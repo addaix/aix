@@ -1703,6 +1703,10 @@ Does *not* validate the key over the network – only that one is discoverable
 via [`resolve_api_key()`](#aix.resolve_api_key) (explicit arg, env/.env, or store). Raises
 [`MissingCredentialError`](#aix.MissingCredentialError) with actionable guidance when absent.
 
+A model alias (`"fast"`, `"best"`, a configured one) is resolved first, so
+the model actually called is the one checked. A `claude-cli/...` model needs
+no key, only the `claude` CLI on the PATH (`RuntimeError` otherwise).
+
 Returns `True` when a key is available, or when the model is local and
 needs none (`is_keyless()`, e.g. `ollama/...`).
 
