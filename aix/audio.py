@@ -617,7 +617,9 @@ def transcribe_with_timestamps(
     )
 
 
-@_logged("translate_audio", default_model=lambda: _get_config().audio.transcription_model)
+@_logged(
+    "translate_audio", default_model=lambda: _get_config().audio.transcription_model
+)
 @_requires_credentials(lambda: _get_config().audio.transcription_model)
 def translate_audio(
     audio: Union[str, Path, BinaryIO, bytes],
