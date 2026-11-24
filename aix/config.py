@@ -71,6 +71,8 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field, fields, replace, is_dataclass, MISSING
 from typing import Any, Callable, Optional, Mapping, Iterator
 
+from aix.calllog import carry_caller
+
 try:  # Python 3.11+
     import tomllib as _tomllib
 except ModuleNotFoundError:  # pragma: no cover - fallback for older interpreters
@@ -395,9 +397,10 @@ def submit_in_context(executor: Any, func: Callable, /, *args: Any, **kwargs: An
     A pool thread starts with an empty context, so it would not see an enclosing
     :func:`using` block. aix's own pools submit through this so a scoped config
     reaches their workers. Each call takes its own copy (a context can only be
-    entered by one thread at a time).
+    entered by one thread at a time). The copy also carries the line that called aix, so
+    the opt-in call log (:mod:`aix.calllog`) records it rather than the pool's thread.
     """
-    return executor.submit(copy_context().run, func, *args, **kwargs)
+    return executor.submit(carry_caller(copy_context()).run, func, *args, **kwargs)
 
 
 @contextmanager

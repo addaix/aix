@@ -37,6 +37,7 @@ from aix.credentials import (
     requires_credentials as _requires_credentials,
 )
 
+from aix.calllog import logged as _logged
 from aix._litellm import UNRESOLVED as _UNRESOLVED, litellm_attr as _litellm_attr
 
 # LiteLLM is deferred: importing it fetches litellm's model-cost map over
@@ -62,6 +63,7 @@ DFLT_EMBEDDING_MODEL = _EmbeddingConfig().model
 DFLT_BATCH_SIZE = _EmbeddingConfig().batch_size
 
 
+@_logged("embeddings", default_model=lambda: _get_config().embeddings.model)
 @_requires_credentials(lambda: _get_config().embeddings.model)
 def embeddings(
     segments: Iterable[str], *, model: str = None, api_key: str = None, **kwargs

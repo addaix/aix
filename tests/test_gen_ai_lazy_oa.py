@@ -107,3 +107,72 @@ def test_legacy_openai_backend_warns_with_removal_version(monkeypatch):
 def test_importing_aix_emits_no_deprecation_warning(tmp_path):
     result = _run(tmp_path, "import warnings; warnings.filterwarnings('error', message='the legacy aix.gen_ai'); import aix; print('ok')")
     assert result.returncode == 0, result.stderr[-2000:]
+
+
+def _legacy_warning_sites(call):
+    """Run ``call`` and return the ``file`` of each legacy-backend DeprecationWarning."""
+    import warnings
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        call()
+    return [
+        w.filename
+        for w in caught
+        if issubclass(w.category, DeprecationWarning) and "legacy aix.gen_ai" in str(w.message)
+    ]
+
+
+def test_legacy_warning_points_at_the_caller_for_every_entry_point(monkeypatch):
+    """Whichever way the legacy backend is reached, the warning names the user's line.
+
+    Python's default filters only show a DeprecationWarning attributed to ``__main__``
+    (or to the test runner's code), so a warning attributed to an aix frame is hidden.
+    """
+    import sys
+    import types
+
+    import pytest
+
+    import aix
+    import aix.gen_ai as gen_ai
+    from aix.gen_ai import openai_genai
+
+    if not hasattr(openai_genai, "chat"):
+        pytest.skip("oa not installed")
+    fake = types.ModuleType("oa")
+    fake.chat = lambda *a, **k: "ok"
+    monkeypatch.setitem(sys.modules, "oa", fake)
+    entry_points = {
+        "openai_genai.chat": lambda: openai_genai.chat("hi"),
+        "aix.gen_ai.chat": lambda: gen_ai.chat("hi", model="gpt-4o"),
+        "chat_funcs[...]": lambda: aix.chat_funcs["gpt-4o"]("hi"),
+        "chat_funcs.<id>": lambda: aix.chat_funcs.gpt_4o("hi"),
+    }
+    for label, call in entry_points.items():
+        assert _legacy_warning_sites(call) == [__file__], label
+
+
+def test_legacy_google_warning_points_at_the_caller(monkeypatch):
+    import types
+
+    import pytest
+
+    import aix.gen_ai as gen_ai
+
+    google_genai = pytest.importorskip("aix.gen_ai.google_genai")
+    if not hasattr(google_genai, "chat"):
+        pytest.skip("google-generativeai not installed")
+
+    class FakeModel:
+        def __init__(self, model):
+            pass
+
+        def generate_content(self, prompt):
+            return types.SimpleNamespace(text="ok")
+
+    monkeypatch.setattr(google_genai.genai, "GenerativeModel", FakeModel)
+    assert _legacy_warning_sites(lambda: google_genai.chat("hi")) == [__file__]
+    assert _legacy_warning_sites(
+        lambda: gen_ai.chat("hi", model="gemini-1.5-flash")
+    ) == [__file__]
