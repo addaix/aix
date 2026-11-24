@@ -138,6 +138,68 @@ def test_a_stream_consumed_to_the_end_is_logged_once_as_ok(monkeypatch):
     assert [r.ok for r in records] == [True]
 
 
+def _sent_at_open_stream(monkeypatch, sent):
+    """Patch chat's completion with one that 'sends' when called and returns an iterator."""
+    import types
+
+    def streaming(**kw):
+        sent.append(1)
+        return iter(
+            [types.SimpleNamespace(choices=[types.SimpleNamespace(delta=types.SimpleNamespace(content=c))]) for c in "ab"]
+        )
+
+    monkeypatch.setattr(chat_module, "_completion", lambda: streaming)
+
+
+@pytest.mark.parametrize(
+    "act",
+    [
+        pytest.param(lambda s: None, id="never-iterated-dropped"),
+        pytest.param(lambda s: s.close(), id="closed-before-first-chunk"),
+        pytest.param(lambda s: next(s), id="one-chunk-then-dropped"),
+    ],
+)
+def test_a_stream_closed_or_dropped_early_is_logged_once_as_ok(monkeypatch, act):
+    """The request is sent when the stream opens, so it is logged however the stream ends."""
+    import gc
+
+    sent, records = [], []
+    _sent_at_open_stream(monkeypatch, sent)
+    stream = aix.chat("q", model="openai/gpt-4o-mini", stream=True, on_call=records.append)
+    assert sent == [1] and records == []
+    act(stream)
+    del stream
+    gc.collect()
+    assert [(r.function, r.ok) for r in records] == [("chat", True)]
+    assert _here(records) == ["test_calllog.py"]
+
+
+def test_closing_an_unstarted_logged_stream_closes_the_stream():
+    from aix.calllog import logged
+
+    closed = []
+
+    class Stream:
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            return 1
+
+        def close(self):
+            closed.append(True)
+
+    @logged("g")
+    def make(*, model=None, stream=True):
+        return Stream()
+
+    records = []
+    s = make(model="m", stream=True, on_call=records.append)
+    s.close()
+    assert closed == [True]
+    assert [r.ok for r in records] == [True]
+
+
 def test_vision_calls_are_logged(monkeypatch):
     vision_module = importlib.import_module("aix.vision")
     monkeypatch.setattr(vision_module, "_completion", lambda: lambda **kw: _Resp())
@@ -263,3 +325,12 @@ def test_model_of_names_the_model_from_the_arguments():
     transcribe_like(b"", engine="deepgram", on_call=records.append)
     transcribe_like(b"", model="openai/whisper-1", on_call=records.append)
     assert [r.model for r in records] == ["deepgram", "openai/whisper-1"]
+
+
+def test_an_error_thrown_into_an_unstarted_logged_stream_is_logged_as_a_failure(monkeypatch):
+    sent, records = [], []
+    _sent_at_open_stream(monkeypatch, sent)
+    stream = aix.chat("q", model="openai/gpt-4o-mini", stream=True, on_call=records.append)
+    with pytest.raises(ValueError, match="stop"):
+        stream.throw(ValueError("stop"))
+    assert [(r.ok, r.error) for r in records] == [(False, "ValueError: stop")]
