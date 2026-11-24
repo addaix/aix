@@ -358,6 +358,31 @@ class TestSample:
             sample("q", n=3, model="anthropic/claude-x", strategy="independent")
         fake_completion.assert_not_called()
 
+    def _no_keys(self, monkeypatch):
+        from aix.credentials import PROVIDER_ENV_VARS, provider_env_vars
+
+        for provider in PROVIDER_ENV_VARS:
+            for env_name in provider_env_vars(provider):
+                monkeypatch.delenv(env_name, raising=False)
+        monkeypatch.setattr("aix.credentials._lookup_store", lambda name: None)
+        monkeypatch.setattr("aix.credentials._dotenv_loaded", True)
+
+    def test_alias_is_resolved_before_the_preflight(self, monkeypatch, fake_completion):
+        """sample(model=<alias>) checks the aliased model's key, as chat() does (#104)."""
+        from aix.credentials import MissingCredentialError
+
+        self._no_keys(monkeypatch)
+        fake_completion.side_effect = _provider_side_effect
+        with aix.using(aliases={"local": "ollama/mistral", "seer": "gpt-4o"}):
+            out = sample("q", n=2, model="local", strategy="independent")
+            assert [s.text for s in out] == ["t0", "t0"]
+            assert fake_completion.call_args.kwargs["model"] == "ollama/mistral"
+            with pytest.raises(MissingCredentialError):
+                sample("q", n=2, model="seer", strategy="independent")
+            monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+            assert len(sample("q", n=2, model="seer", strategy="independent")) == 2
+            assert len(sample("q", n=2, model="fast", strategy="independent")) == 2
+
 
 class TestDotenvLoadIsThreadSafe:
     def test_concurrent_first_load_waits_for_the_load(self, monkeypatch):

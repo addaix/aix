@@ -431,7 +431,8 @@ def sample(
         )
 
     # Preflight credentials once, here, so a missing key raises itself instead
-    # of n copies of it surfacing from the pool as a SamplingError.
+    # of n copies of it surfacing from the pool as a SamplingError. It resolves
+    # an alias first, so the model actually called is the one checked.
     _check_requirements(model or _get_config().chat.model, api_key=api_key)
 
     call_kwargs = dict(model=model, temperature=temperature, api_key=api_key, **kwargs)
