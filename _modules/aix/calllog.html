@@ -488,6 +488,21 @@
     <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_close_unstarted</span><span class="p">(</span><span class="n">stream</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">recording</span><span class="p">:</span> <span class="n">_Recording</span><span class="p">,</span> <span class="n">exc</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Close a ``stream`` that was never delegated to, then record ``exc`` (``None``: ok).</span>
+
+<span class="sd">    An error raised while closing is recorded instead, and propagates.</span>
+<span class="sd">    """</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">close</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="s2">"close"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">close</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">close</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">close_exc</span><span class="p">:</span>
+        <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">close_exc</span><span class="p">)</span>
+        <span class="k">raise</span>
+    <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_logged_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">:</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">recording</span><span class="p">:</span> <span class="n">_Recording</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""Yield from ``stream`` and send the record when it ends.</span>
 
@@ -499,23 +514,25 @@
 <span class="sd">    The generator returned is already started (see :func:`_started_logged_stream`):</span>
 <span class="sd">    closing or collecting a generator that never ran skips its body, and the request</span>
 <span class="sd">    was sent when the stream opened, so a stream nobody read must still be recorded.</span>
+<span class="sd">    Until its first item it behaves as an unstarted generator would: ``throw(exc)``</span>
+<span class="sd">    closes ``stream`` and raises ``exc`` (what ``yield from`` does to a stream that</span>
+<span class="sd">    never started), and ``send(x)`` with ``x`` not ``None`` raises ``TypeError``,</span>
+<span class="sd">    closing ``stream`` and ending the logged stream with that error. Either way the</span>
+<span class="sd">    call is recorded once.</span>
 <span class="sd">    """</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">yield</span>  <span class="c1"># the priming step: from here on, close() and collection run the handlers</span>
+        <span class="n">sent</span> <span class="o">=</span> <span class="k">yield</span>  <span class="c1"># the priming step: from here on, close() and collection run the handlers</span>
     <span class="k">except</span> <span class="ne">GeneratorExit</span><span class="p">:</span>
         <span class="c1"># Closed before its first item: ``stream`` was never delegated to, so close it.</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">close</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="s2">"close"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">close</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">close</span><span class="p">()</span>
-        <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-            <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
-            <span class="k">raise</span>
-        <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
+        <span class="n">_close_unstarted</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">recording</span><span class="p">)</span>
         <span class="k">raise</span>
     <span class="k">except</span> <span class="ne">BaseException</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>  <span class="c1"># thrown in before the first item</span>
-        <span class="n">recording</span><span class="o">.</span><span class="n">finish</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span>
+        <span class="n">_close_unstarted</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">recording</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
         <span class="k">raise</span>
+    <span class="k">if</span> <span class="n">sent</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">exc</span> <span class="o">=</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"can't send non-None value to a just-started generator"</span><span class="p">)</span>
+        <span class="n">_close_unstarted</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">recording</span><span class="p">,</span> <span class="n">exc</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">exc</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="k">yield from</span> <span class="n">stream</span>
     <span class="k">except</span> <span class="ne">GeneratorExit</span><span class="p">:</span>
@@ -639,7 +656,7 @@
       
     </aside>
   </div>
-</div><script src="../../_static/documentation_options.js?v=c152968f"></script>
+</div><script src="../../_static/documentation_options.js?v=6812e2e9"></script>
     <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
     <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
