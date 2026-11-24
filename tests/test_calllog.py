@@ -82,3 +82,107 @@ def test_a_broken_logger_never_breaks_the_call():
         raise ValueError("logger bug")
 
     assert aix.chat("hello", model="openai/gpt-4o-mini", on_call=bad) == "hi"
+
+
+def _here(records):
+    """The callers of ``records``, reduced to this test file's name (or the full path)."""
+    return [r.caller.rsplit("/", 1)[-1].split(":")[0] for r in records]
+
+
+def test_calls_on_aix_worker_pools_record_the_user_line():
+    """batch_chat / sample(concurrency>1) run on aix's pools: the caller is still this file."""
+    records = []
+    with aix.call_logger(records.append):
+        list(aix.batch_chat(["a", "b"], model="openai/gpt-4o-mini", max_workers=2))
+        aix.sample("q", n=3, model="openai/gpt-4o-mini", concurrency=3)
+    assert len(records) == 5
+    assert set(_here(records)) == {"test_calllog.py"}, [r.caller for r in records]
+
+
+def test_an_error_raised_while_a_stream_is_consumed_is_logged_as_a_failure(monkeypatch):
+    import types
+
+    def streaming(**kw):
+        def chunks():
+            yield types.SimpleNamespace(
+                choices=[types.SimpleNamespace(delta=types.SimpleNamespace(content="a"))]
+            )
+            raise RuntimeError("stream died")
+
+        return chunks()
+
+    monkeypatch.setattr(chat_module, "_completion", lambda: streaming)
+    records = []
+    stream = aix.chat("q", model="openai/gpt-4o-mini", stream=True, on_call=records.append)
+    assert records == []  # recorded when the stream ends, not when it opens
+    with pytest.raises(RuntimeError, match="stream died"):
+        "".join(stream)
+    (r,) = records
+    assert r.ok is False and "stream died" in r.error
+    assert _here(records) == ["test_calllog.py"]
+
+
+def test_a_stream_consumed_to_the_end_is_logged_once_as_ok(monkeypatch):
+    import types
+
+    def streaming(**kw):
+        return iter(
+            [types.SimpleNamespace(choices=[types.SimpleNamespace(delta=types.SimpleNamespace(content=c))]) for c in "ab"]
+        )
+
+    monkeypatch.setattr(chat_module, "_completion", lambda: streaming)
+    records = []
+    assert "".join(aix.chat("q", model="openai/gpt-4o-mini", stream=True, on_call=records.append)) == "ab"
+    assert [r.ok for r in records] == [True]
+
+
+def test_vision_calls_are_logged(monkeypatch):
+    vision_module = importlib.import_module("aix.vision")
+    monkeypatch.setattr(vision_module, "_completion", lambda: lambda **kw: _Resp())
+    records = []
+    png = b"\x89PNG\r\n\x1a\n" + b"0" * 20
+    with aix.call_logger(records.append):
+        assert aix.describe_image(png, model="openai/gpt-4o-mini") == "hi"
+    assert [(r.function, r.model, r.ok) for r in records] == [
+        ("describe_image", "openai/gpt-4o-mini", True)
+    ]
+    assert _here(records) == ["test_calllog.py"]
+
+
+def test_embeddings_are_logged_with_the_default_model(monkeypatch):
+    import types
+
+    from aix import config
+
+    embeddings_module = importlib.import_module("aix.embeddings")
+    response = types.SimpleNamespace(data=[{"embedding": [0.1, 0.2]}])
+    monkeypatch.setattr(embeddings_module, "_embedding", lambda: lambda **kw: response)
+    records = []
+    with aix.call_logger(records.append):
+        assert aix.embed("hi") == [0.1, 0.2]
+    (r,) = records
+    assert (r.function, r.ok) == ("embeddings", True)
+    assert r.model == config.resolve_model(config.get_config().embeddings.model)
+    assert _here(records) == ["test_calllog.py"]
+
+
+def test_logged_entry_points_keep_their_signature():
+    import inspect
+
+    assert "model" in inspect.signature(aix.describe_image).parameters
+    assert "on_call" not in inspect.signature(aix.chat).parameters
+
+
+def test_audio_calls_are_logged_once(monkeypatch):
+    audio_module = importlib.import_module("aix.audio")
+    monkeypatch.setattr(audio_module, "_litellm_speech", lambda **kw: b"audio")
+    monkeypatch.setattr(audio_module, "_litellm_transcription", lambda **kw: {"text": "hello"})
+    records = []
+    with aix.call_logger(records.append):
+        aix.text_to_speech("hi", model="openai/tts-1")
+        aix.transcribe(b"RIFF....", model="openai/whisper-1")
+    assert [(r.function, r.model, r.ok) for r in records] == [
+        ("text_to_speech", "openai/tts-1", True),
+        ("transcribe", "openai/whisper-1", True),
+    ]
+    assert set(_here(records)) == {"test_calllog.py"}

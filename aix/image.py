@@ -30,6 +30,7 @@ from pathlib import Path
 import base64
 from io import BytesIO
 
+from aix.calllog import logged as _logged
 from aix._litellm import UNRESOLVED as _UNRESOLVED, litellm_attr as _litellm_attr
 
 # LiteLLM is deferred: importing it fetches litellm's model-cost map over
@@ -195,6 +196,7 @@ class GeneratedImage:
         return f"GeneratedImage(model={self.model}, url={bool(self.url)})"
 
 
+@_logged("generate_image", default_model=lambda: _get_config().image.model)
 @_requires_credentials(lambda: _get_config().image.model)
 def generate_image(
     prompt: str,
@@ -296,6 +298,7 @@ def generate_image(
     )
 
 
+@_logged("generate_images", default_model=lambda: _get_config().image.model)
 @_requires_credentials(lambda: _get_config().image.model)
 def generate_images(
     prompt: str,
@@ -389,6 +392,7 @@ def generate_images(
     return images
 
 
+@_logged("edit_image", default_model=lambda: _get_config().image.edit_model)
 @_requires_credentials(lambda: _get_config().image.edit_model)
 def edit_image(
     image_path: Union[str, Path],
@@ -479,6 +483,7 @@ def edit_image(
     return images[0] if n == 1 else images
 
 
+@_logged("create_variation", default_model=lambda: _get_config().image.variation_model)
 @_requires_credentials(lambda: _get_config().image.variation_model)
 def create_variation(
     image_path: Union[str, Path],

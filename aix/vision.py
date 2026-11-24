@@ -62,6 +62,7 @@ from aix.config import (
     resolve_model as _resolve_model,
     VisionConfig as _VisionConfig,
 )
+from aix.calllog import logged as _logged
 from aix.credentials import requires_credentials as _requires_credentials
 
 from aix._litellm import UNRESOLVED as _UNRESOLVED, litellm_attr as _litellm_attr
@@ -162,6 +163,7 @@ def to_image_content(
     return {"type": "image_url", "image_url": image_url}
 
 
+@_logged("describe_image", default_model=lambda: _get_config().vision.model)
 @_requires_credentials(lambda: _get_config().vision.model)
 def describe_image(
     image: "Union[str, Path, bytes, Any]",
@@ -327,6 +329,7 @@ _COMPARE_INSTRUCTION = (
 )
 
 
+@_logged("compare_images", default_model=lambda: _get_config().vision.model)
 @_requires_credentials(lambda: _get_config().vision.model)
 def compare_images(
     candidate: "Union[str, Path, bytes, Any]",

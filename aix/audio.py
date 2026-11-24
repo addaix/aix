@@ -20,6 +20,7 @@ from typing import Union, BinaryIO
 from pathlib import Path
 import mimetypes
 
+from aix.calllog import logged as _logged
 from aix._litellm import UNRESOLVED as _UNRESOLVED, litellm_attr as _litellm_attr
 
 # LiteLLM is deferred: importing it fetches litellm's model-cost map over
@@ -215,6 +216,7 @@ class TranscriptionResult:
         )
 
 
+@_logged("text_to_speech", default_model=lambda: _get_config().audio.tts_model)
 @_requires_credentials(lambda: _get_config().audio.tts_model)
 def text_to_speech(
     text: str,
@@ -306,6 +308,9 @@ def text_to_speech(
     )
 
 
+@_logged(
+    "transcribe", default_model=lambda: _get_config().audio.transcription_model
+)
 def transcribe(
     audio: Union[str, Path, BinaryIO, bytes],
     *,
@@ -609,6 +614,7 @@ def transcribe_with_timestamps(
     )
 
 
+@_logged("translate_audio", default_model=lambda: _get_config().audio.transcription_model)
 @_requires_credentials(lambda: _get_config().audio.transcription_model)
 def translate_audio(
     audio: Union[str, Path, BinaryIO, bytes],
