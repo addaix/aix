@@ -206,6 +206,21 @@ def _record(function: str, model: Optional[str], explicit: Optional[CallLogger])
     recording.finish()
 
 
+def _close_unstarted(stream: Iterator, recording: _Recording, exc=None) -> None:
+    """Close a ``stream`` that was never delegated to, then record ``exc`` (``None``: ok).
+
+    An error raised while closing is recorded instead, and propagates.
+    """
+    try:
+        close = getattr(stream, "close", None)
+        if close is not None:
+            close()
+    except BaseException as close_exc:
+        recording.finish(close_exc)
+        raise
+    recording.finish(exc)
+
+
 def _logged_stream(stream: Iterator, recording: _Recording):
     """Yield from ``stream`` and send the record when it ends.
 
@@ -217,23 +232,25 @@ def _logged_stream(stream: Iterator, recording: _Recording):
     The generator returned is already started (see :func:`_started_logged_stream`):
     closing or collecting a generator that never ran skips its body, and the request
     was sent when the stream opened, so a stream nobody read must still be recorded.
+    Until its first item it behaves as an unstarted generator would: ``throw(exc)``
+    closes ``stream`` and raises ``exc`` (what ``yield from`` does to a stream that
+    never started), and ``send(x)`` with ``x`` not ``None`` raises ``TypeError``,
+    closing ``stream`` and ending the logged stream with that error. Either way the
+    call is recorded once.
     """
     try:
-        yield  # the priming step: from here on, close() and collection run the handlers
+        sent = yield  # the priming step: from here on, close() and collection run the handlers
     except GeneratorExit:
         # Closed before its first item: ``stream`` was never delegated to, so close it.
-        try:
-            close = getattr(stream, "close", None)
-            if close is not None:
-                close()
-        except BaseException as exc:
-            recording.finish(exc)
-            raise
-        recording.finish()
+        _close_unstarted(stream, recording)
         raise
     except BaseException as exc:  # thrown in before the first item
-        recording.finish(exc)
+        _close_unstarted(stream, recording, exc)
         raise
+    if sent is not None:
+        exc = TypeError("can't send non-None value to a just-started generator")
+        _close_unstarted(stream, recording, exc)
+        raise exc
     try:
         result = yield from stream
     except GeneratorExit:

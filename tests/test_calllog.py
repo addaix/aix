@@ -334,3 +334,78 @@ def test_an_error_thrown_into_an_unstarted_logged_stream_is_logged_as_a_failure(
     with pytest.raises(ValueError, match="stop"):
         stream.throw(ValueError("stop"))
     assert [(r.ok, r.error) for r in records] == [(False, "ValueError: stop")]
+
+
+def _closable_stream_maker(closed):
+    """A ``@logged`` maker returning a non-generator stream that notes when it is closed."""
+    from aix.calllog import logged
+
+    class Stream:
+        def __iter__(self):
+            return self
+
+        def __next__(self):
+            return 1
+
+        def close(self):
+            closed.append(True)
+
+    @logged("g")
+    def make(*, model=None, stream=True):
+        return Stream()
+
+    return make
+
+
+def test_an_error_thrown_into_an_unstarted_logged_stream_closes_the_stream():
+    """Like ``yield from``, a throw before the first chunk closes the stream (addaix/aix#102)."""
+    closed, records = [], []
+    s = _closable_stream_maker(closed)(model="m", stream=True, on_call=records.append)
+    with pytest.raises(ValueError, match="stop"):
+        s.throw(ValueError("stop"))
+    assert closed == [True]
+    assert [(r.ok, r.error) for r in records] == [(False, "ValueError: stop")]
+
+
+def test_an_error_thrown_into_an_unstarted_logged_generator_finishes_it():
+    from aix.calllog import logged
+
+    ran = []
+
+    def gen():
+        ran.append(True)
+        yield 1
+
+    inner = gen()
+
+    @logged("h")
+    def make(*, model=None):
+        return inner
+
+    records = []
+    s = make(model="m", on_call=records.append)
+    with pytest.raises(ValueError, match="stop"):
+        s.throw(ValueError("stop"))
+    assert ran == [] and inner.gi_frame is None  # finished without running its body
+    assert [(r.ok, r.error) for r in records] == [(False, "ValueError: stop")]
+
+
+def test_a_first_non_none_send_raises_like_an_unstarted_generator():
+    """``send(x)`` before the first chunk is a TypeError, not a dropped value (addaix/aix#102)."""
+    closed, records = [], []
+    s = _closable_stream_maker(closed)(model="m", stream=True, on_call=records.append)
+    with pytest.raises(TypeError, match="just-started generator"):
+        s.send(5)
+    assert closed == [True]
+    assert [(r.ok, r.error.split(":")[0]) for r in records] == [(False, "TypeError")]
+    with pytest.raises(StopIteration):  # the stream ended with the error
+        next(s)
+    assert len(records) == 1
+
+
+def test_a_first_send_of_none_starts_the_stream():
+    closed, records = [], []
+    s = _closable_stream_maker(closed)(model="m", stream=True, on_call=records.append)
+    assert s.send(None) == 1
+    s.close()
+    assert closed == [True] and [r.ok for r in records] == [True]
