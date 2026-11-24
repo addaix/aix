@@ -811,7 +811,7 @@ for model_id in ["gpt-4o-mini", "claude-sonnet-4", "gemini-1.5-flash"]:
 
 - **API Reference**: See docstrings in each module
 - **Examples**: Check `examples/` directory
-- **GitHub**: https://github.com/thorwhalen/aix
+- **GitHub**: https://github.com/addaix/aix
 
 ## Contributing
 
